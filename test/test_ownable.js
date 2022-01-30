@@ -31,10 +31,4 @@ describe("Test Ownable", function () {
     expect(await memento.supply()).to.equal(1);
     expect(await memento.ownerOf(0)).to.equal(user.address);
   });
-
-  after(async function () {
-    const balance = await waffle.provider.getBalance(memento.address);
-    const tx = await memento.withdraw(balance);
-    tx.wait();
-  })
 });
