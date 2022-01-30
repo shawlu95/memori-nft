@@ -24,10 +24,17 @@ describe("Test Ownable", function () {
   });
 
   it("Test transfer ownsership", async function () {
-    memento.transferOwnership(user.address);
+    const tx = await memento.connect(owner).transferOwnership(user.address);
+    tx.wait();
     expect(await memento.owner()).to.equal(user.address);
     await memento.connect(user).mint(user.address, user.address, hash);
     expect(await memento.supply()).to.equal(1);
     expect(await memento.ownerOf(0)).to.equal(user.address);
   });
+
+  after(async function () {
+    const balance = await waffle.provider.getBalance(memento.address);
+    const tx = await memento.withdraw(balance);
+    tx.wait();
+  })
 });

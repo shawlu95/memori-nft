@@ -37,4 +37,10 @@ describe("Test Airdrop", function () {
     expect(await memento.authorOf(0)).to.equal(user1.address);
     expect(await memento.ownerOf(0)).to.equal(user2.address);
   });
+
+  after(async function () {
+    const balance = await waffle.provider.getBalance(memento.address);
+    const tx = await memento.withdraw(balance);
+    tx.wait();
+  })
 });

@@ -67,4 +67,9 @@ describe("Test Mint", function () {
       .to.be.revertedWith("Insufficient fund!");
   });
 
+  after(async function () {
+    const balance = await waffle.provider.getBalance(memento.address);
+    const tx = await memento.withdraw(balance);
+    tx.wait();
+  })
 });

@@ -33,4 +33,10 @@ describe("Test Price", function () {
     await expect(memento.connect(user).setPrice(newPrice))
         .to.be.revertedWith("Ownable: caller is not the owner");
   });
+
+  after(async function () {
+    const balance = await waffle.provider.getBalance(memento.address);
+    const tx = await memento.withdraw(balance);
+    tx.wait();
+  })
 });

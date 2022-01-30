@@ -38,6 +38,10 @@ module.exports = {
     },
   },
   networks: {
+    ganache: {
+      url: "HTTP://127.0.0.1:7545",
+      network_id: "5777"
+    },
     mumbai: {
       chainId: 80001,
       url: "https://rpc-mumbai.maticvigil.com",

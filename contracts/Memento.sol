@@ -18,6 +18,7 @@ contract Memento is Initializable, OwnableUpgradeable, ERC721URIStorageUpgradeab
     function initialize() public initializer {
         __ERC721_init("Memento Script Betas", "MEMO");
         __Ownable_init();
+        __ERC721URIStorage_init();
         price = 10**18;
     }
 

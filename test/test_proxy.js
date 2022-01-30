@@ -38,4 +38,10 @@ describe("Test proxy", function () {
 
     expect(await memento.name()).to.equal("Memento Script Betas");
   });
+
+  after(async function () {
+    const balance = await waffle.provider.getBalance(memento.address);
+    const tx = await memento.withdraw(balance);
+    tx.wait();
+  })
 });

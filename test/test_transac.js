@@ -27,4 +27,10 @@ describe("Test Transaction", function () {
     expect(await waffle.provider.getBalance(memento.address)).to.equal(0);
   });
 
+  after(async function () {
+    const balance = await waffle.provider.getBalance(memento.address);
+    const tx = await memento.withdraw(balance);
+    tx.wait();
+  })
+
 });
