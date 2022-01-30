@@ -42,7 +42,7 @@ module.exports = {
       url: "HTTP://127.0.0.1:7545",
       network_id: "5777"
     },
-    mumbai: {
+    polygonMumbai: {
       chainId: 80001,
       url: "https://rpc-mumbai.maticvigil.com",
       from: process.env.ADMIN_PRIVATE_KEY,
@@ -61,19 +61,19 @@ module.exports = {
       accounts: [process.env.ADMIN_PRIVATE_KEY]
     }
   },
-  etherscan: {
-    apiKey: process.env.POLYGONSCAN_TOKEN
-  },
   // etherscan: {
-  //   apiKey: {
-  //       mainnet: process.env.ETHERSCAN_TOKEN,
-  //       rinkeby: process.env.ETHERSCAN_TOKEN,
-  //       bsc: process.env.BSCSCAN_TOKEN,
-  //       bscTestnet: process.env.BSCSCAN_TOKEN,
-  //       polygon: process.env.POLYGONSCAN_TOKEN,
-  //       mumbai: process.env.POLYGONSCAN_TOKEN
-  //   }
+  //   apiKey: process.env.POLYGONSCAN_TOKEN
   // },
+  etherscan: {
+    apiKey: {
+        mainnet: process.env.ETHERSCAN_TOKEN,
+        rinkeby: process.env.ETHERSCAN_TOKEN,
+        bsc: process.env.BSCSCAN_TOKEN,
+        bscTestnet: process.env.BSCSCAN_TOKEN,
+        polygon: process.env.POLYGONSCAN_TOKEN,
+        polygonMumbai: process.env.POLYGONSCAN_TOKEN
+    }
+  },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
