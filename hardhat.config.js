@@ -5,6 +5,8 @@ require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
+require('@openzeppelin/hardhat-upgrades');
+
 const { types } = require("hardhat/config");
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -27,7 +29,7 @@ task("balance", "Prints an account's balance")
 module.exports = {
   defaultNetwork: "hardhat",
   solidity: {
-    version: "0.8.0",
+    version: "0.8.2",
     settings: {
       optimizer: {
         enabled: true,

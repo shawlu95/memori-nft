@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { ethers, waffle } = require("hardhat");
+const { ethers, waffle, upgrades } = require("hardhat");
 
 describe("Test Mint", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -14,7 +14,7 @@ describe("Test Mint", function () {
     [owner, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await Memento.deploy();
+    memento = await upgrades.deployProxy(Memento, []);
   });
 
   it("Test mint by owner", async function () {

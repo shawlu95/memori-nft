@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { ethers, waffle } = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
 
 describe("Test Airdrop", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -14,7 +14,7 @@ describe("Test Airdrop", function () {
     [owner, user1, user2] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await Memento.deploy();
+    memento = await upgrades.deployProxy(Memento, []);
   });
 
   it("Mint by owner, assign to another user", async function () {

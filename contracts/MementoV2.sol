@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract Memento is Initializable, OwnableUpgradeable, ERC721URIStorageUpgradeable {
+contract MementoV2 is Initializable, OwnableUpgradeable, ERC721URIStorageUpgradeable {
     using Counters for Counters.Counter;
 
     Counters.Counter private counter;
