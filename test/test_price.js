@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { ethers, waffle } = require("hardhat");
+const { ethers, waffle, upgrades } = require("hardhat");
 
 describe("Test Price", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -14,7 +14,7 @@ describe("Test Price", function () {
     [owner, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await Memento.deploy();
+    memento = await upgrades.deployProxy(Memento, []);
   });
 
   it("Test owner set price", async function () {
@@ -33,4 +33,10 @@ describe("Test Price", function () {
     await expect(memento.connect(user).setPrice(newPrice))
         .to.be.revertedWith("Ownable: caller is not the owner");
   });
+
+  after(async function () {
+    const balance = await waffle.provider.getBalance(memento.address);
+    const tx = await memento.withdraw(balance);
+    tx.wait();
+  })
 });
