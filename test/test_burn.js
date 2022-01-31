@@ -1,10 +1,13 @@
 const { expect } = require("chai");
 const { ethers, waffle, upgrades } = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 describe("Test Burn", function () {
   const hash0 = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash1 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
   const IPFS = 'ipfs://';
+  const price = "10000000000000000000";
+  const reward = 0;
 
   let memento;
   let owner;
@@ -14,7 +17,7 @@ describe("Test Burn", function () {
     [owner, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await upgrades.deployProxy(Memento, []);
+    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
 
     const mint0 = await memento.mint(owner.address, owner.address, hash0);
     mint0.wait();

@@ -2,22 +2,31 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC1820RegistryUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC777/ERC777Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC777/IERC777RecipientUpgradeable.sol";
 
 contract MementoV2 is
     Initializable,
     AccessControlUpgradeable,
     ERC721URIStorageUpgradeable,
-    PausableUpgradeable
+    PausableUpgradeable,
+    IERC777RecipientUpgradeable
 {
     using Counters for Counters.Counter;
+
+    IERC1820RegistryUpgradeable private _erc1820;
+
+    ERC777Upgradeable private _token;
 
     Counters.Counter private minted;
     Counters.Counter private burned;
     uint256 public price;
+    uint256 public reward;
     mapping(bytes32 => bool) private _ipfsHash;
     mapping(uint256 => address) private _authors;
     mapping(address => uint256) private _allowance;
@@ -34,9 +43,23 @@ contract MementoV2 is
         uint256 allowance
     );
     event SetPrice(address indexed by, uint256 price);
-    event WithdrawFund(address indexed by, uint256 amount);
+    event SetReward(address indexed by, uint256 reward);
+    event WithdrawEther(address indexed by, uint256 amount);
+    event WithdrawToken(address indexed by, uint256 amount);
+    event ReceivedToken(
+        address operator,
+        address from,
+        address to,
+        uint256 amount,
+        bytes userData,
+        bytes operatorData
+    );
 
-    function initialize() public initializer {
+    function initialize(
+        uint256 _price,
+        uint256 _reward,
+        address token
+    ) public initializer {
         __ERC165_init_unchained();
         __ERC721_init_unchained("Memento Script Betas", "MEMO");
         __Context_init_unchained();
@@ -51,7 +74,19 @@ contract MementoV2 is
         _setupRole(BURNER_ROLE, _msgSender());
         _setupRole(FINANCE_ROLE, _msgSender());
 
-        price = 10**18;
+        _token = ERC777Upgradeable(token);
+        _erc1820 = IERC1820RegistryUpgradeable(
+            0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
+        );
+
+        _erc1820.setInterfaceImplementer(
+            address(this),
+            keccak256("ERC777TokensRecipient"),
+            address(this)
+        );
+
+        price = _price;
+        reward = _reward;
     }
 
     function supply() public view returns (uint256) {
@@ -106,6 +141,9 @@ contract MementoV2 is
             require(msg.value >= price, "Insufficient fund!");
         }
         _execMint(recipient, _msgSender(), tokenURI);
+        if (reward > 0) {
+            _token.send(_msgSender(), reward, "");
+        }
     }
 
     function _execMint(
@@ -135,7 +173,16 @@ contract MementoV2 is
     function withdraw(uint256 amount) public onlyRole(FINANCE_ROLE) {
         require(amount <= address(this).balance, "Insufficient fund!");
         payable(_msgSender()).transfer(amount);
-        emit WithdrawFund(_msgSender(), amount);
+        emit WithdrawEther(_msgSender(), amount);
+    }
+
+    function withdrawToken(uint256 amount) public onlyRole(FINANCE_ROLE) {
+        require(
+            amount <= _token.balanceOf(address(this)),
+            "Insufficient fund!"
+        );
+        _token.send(_msgSender(), amount, "");
+        emit WithdrawToken(_msgSender(), amount);
     }
 
     function setRoleAdmin(bytes32 role, bytes32 adminRole)
@@ -145,9 +192,18 @@ contract MementoV2 is
         _setRoleAdmin(role, adminRole);
     }
 
+    function setToken(address token) public onlyRole(FINANCE_ROLE) {
+        _token = ERC777Upgradeable(token);
+    }
+
     function setPrice(uint256 _price) public onlyRole(FINANCE_ROLE) {
         price = _price;
         emit SetPrice(_msgSender(), _price);
+    }
+
+    function setReward(uint256 _reward) public onlyRole(FINANCE_ROLE) {
+        reward = _reward;
+        emit SetReward(_msgSender(), _reward);
     }
 
     function setAllowance(address _user, uint256 _allowed)
@@ -188,5 +244,20 @@ contract MementoV2 is
         return super.supportsInterface(interfaceId);
     }
 
-    uint256[48] private __gap;
+    function tokensReceived(
+        address operator,
+        address from,
+        address to,
+        uint256 amount,
+        bytes calldata userData,
+        bytes calldata operatorData
+    ) external override {
+        require(
+            msg.sender == address(_token),
+            "Simple777Recipient: Invalid token"
+        );
+        emit ReceivedToken(operator, from, to, amount, userData, operatorData);
+    }
+
+    // uint256[48] private __gap;
 }

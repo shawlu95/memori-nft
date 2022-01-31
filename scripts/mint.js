@@ -6,18 +6,19 @@ const hre = require("hardhat");
 
 async function main() {
   await hre.run('compile');
-  const address = '0xF47702A21ef206320eEc99ADaA542321544887E4';
+  const [owner] = await ethers.getSigners();
+  const address = '0x796902eb370a1c8B06Aa2501760c4378a6a01A4e';
   const Memento = await ethers.getContractFactory("Memento");
   const memento = Memento.attach(address);
   console.log("Memento:", memento.address);
   console.log("Name", await memento.name());
   console.log("Symbol", await memento.symbol());
 
-  const owner = await memento.owner();
-  console.log("Owner", owner);
+  // const owner = await memento.owner();
+  // console.log("Owner", owner);
 
   const hash = 'QmSghap2dJkv2n2rJxtAxg4qDZYy1kciDANsoQZKuiCCPw';
-  const tx = await memento.mint(owner, owner, hash);
+  const tx = await memento.payToMint(owner.address, hash, { value: "1000000000000000000" });
 
   await tx.wait();
 

@@ -1,9 +1,12 @@
 const { expect } = require("chai");
 const { ethers, upgrades } = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 describe("Test Allowance", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const IPFS = 'ipfs://';
+  const price = "10000000000000000000";
+  const reward = 0;
 
   let memento;
   let owner, admin, finance, user;
@@ -12,7 +15,7 @@ describe("Test Allowance", function () {
     [owner, admin, finance, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await upgrades.deployProxy(Memento, []);
+    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Test set allowance by default admin", async function () {
@@ -47,14 +50,14 @@ describe("Test Allowance", function () {
 
   it("Test reject non-owner trying to set allowance", async function () {
     await expect(memento.connect(user).setAllowance(user.address, 5))
-        .to.be.reverted;
+      .to.be.reverted;
   });
 
-  it("Test mint with allowance", async function() {
+  it("Test mint with allowance", async function () {
     await memento.setAllowance(user.address, 5);
     expect(await memento.allowanceOf(user.address)).to.equal(5);
 
-    await memento.connect(user).payToMint(user.address, hash, {"value": 0});
+    await memento.connect(user).payToMint(user.address, hash, { "value": 0 });
     expect(await memento.allowanceOf(user.address)).to.equal(4);
     expect(await memento.supply()).to.equal(1);
     expect(await memento.tokenURI(0)).to.equal(IPFS + hash);

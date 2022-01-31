@@ -1,9 +1,12 @@
 const { expect } = require("chai");
 const { ethers, upgrades } = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 describe("Test Airdrop", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const IPFS = 'ipfs://';
+  const price = "10000000000000000000";
+  const reward = 0;
 
   let memento;
   let owner;
@@ -14,7 +17,7 @@ describe("Test Airdrop", function () {
     [owner, user1, user2] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await upgrades.deployProxy(Memento, []);
+    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Mint by owner, assign to another user", async function () {
@@ -31,7 +34,7 @@ describe("Test Airdrop", function () {
     const price = await memento.price();
     expect(await memento.supply()).to.equal(0);
 
-    await memento.connect(user1).payToMint(user2.address, hash, {"value": price});
+    await memento.connect(user1).payToMint(user2.address, hash, { "value": price });
     expect(await memento.supply()).to.equal(1);
     expect(await memento.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memento.authorOf(0)).to.equal(user1.address);

@@ -1,10 +1,13 @@
 const { expect } = require("chai");
 const { ethers, upgrades } = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 describe.skip("Test Ownable", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
   const IPFS = 'ipfs://';
+  const price = "10000000000000000000";
+  const reward = 0;
 
   let memento;
   let owner;
@@ -14,7 +17,7 @@ describe.skip("Test Ownable", function () {
     [owner, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await upgrades.deployProxy(Memento, []);
+    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Test owner", async function () {

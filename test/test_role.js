@@ -1,7 +1,10 @@
 const { expect } = require("chai");
 const { ethers, waffle, upgrades } = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 describe("Test Role", function () {
+  const price = "10000000000000000000";
+  const reward = 0;
 
   let memento;
   let owner, admin, minter, user; // same applies to pauser, burner, finance roles
@@ -11,7 +14,7 @@ describe("Test Role", function () {
     [owner, admin, minter, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await upgrades.deployProxy(Memento, []);
+    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
 
     ADMIN_ROLE = await memento.ADMIN_ROLE();
     MINTER_ROLE = await memento.MINTER_ROLE();
@@ -29,13 +32,13 @@ describe("Test Role", function () {
   });
 
   it("Test default admin assigns role admin to role", async function () {
-      const setRoleAdmin = await memento.connect(owner).setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
-      setRoleAdmin.wait();
+    const setRoleAdmin = await memento.connect(owner).setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
+    setRoleAdmin.wait();
 
-      const grantRole = await memento.connect(owner).grantRole(ADMIN_ROLE, admin.address);
-      grantRole.wait();
-      expect(await memento.getRoleAdmin(MINTER_ROLE)).to.equal(ADMIN_ROLE);
-      expect(await memento.hasRole(ADMIN_ROLE, admin.address)).to.equal(true);
+    const grantRole = await memento.connect(owner).grantRole(ADMIN_ROLE, admin.address);
+    grantRole.wait();
+    expect(await memento.getRoleAdmin(MINTER_ROLE)).to.equal(ADMIN_ROLE);
+    expect(await memento.hasRole(ADMIN_ROLE, admin.address)).to.equal(true);
   });
 
   it("Test default admin add account to role", async function () {
@@ -44,7 +47,7 @@ describe("Test Role", function () {
     expect(await memento.hasRole(MINTER_ROLE, minter.address)).to.equal(true);
     expect(await memento.hasRole(MINTER_ROLE, user.address)).to.equal(false);
   });
-  
+
   it("Test admin add account to role", async function () {
     const setRoleAdmin = await memento.setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
     setRoleAdmin.wait();

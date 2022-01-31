@@ -1,10 +1,14 @@
 const { expect } = require("chai");
+const { BigNumber } = require("ethers");
 const { ethers, waffle, upgrades } = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 describe("Test Mint", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
   const IPFS = 'ipfs://';
+  const price = "10000000000000000000";
+  const reward = 0;
 
   let memento;
   let owner;
@@ -12,9 +16,8 @@ describe("Test Mint", function () {
 
   beforeEach(async function () {
     [owner, minter, user] = await ethers.getSigners();
-
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await upgrades.deployProxy(Memento, []);
+    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Test mint by owner", async function () {
@@ -25,7 +28,7 @@ describe("Test Mint", function () {
     expect(await memento.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memento.authorOf(0)).to.equal(owner.address);
     expect(await memento.ownerOf(0)).to.equal(owner.address);
-    
+
     await memento.mint(owner.address, owner.address, hash2);
     expect(await memento.supply()).to.equal(2);
     expect(await memento.tokenURI(1)).to.equal(IPFS + hash2);
@@ -38,7 +41,7 @@ describe("Test Mint", function () {
     expect(await memento.hasRole(minterRole, minter.address)).to.equal(false);
     const grantRole = await memento.connect(owner).grantRole(minterRole, minter.address);
     grantRole.wait();
-    expect(await memento.hasRole(minterRole, minter.address)).to.equal(true); 
+    expect(await memento.hasRole(minterRole, minter.address)).to.equal(true);
 
     await memento.connect(minter).mint(minter.address, minter.address, hash);
     expect(await memento.supply()).to.equal(1);
@@ -60,9 +63,10 @@ describe("Test Mint", function () {
 
   it("Test pay to mint", async function () {
     const price = await memento.price();
+    console.log("price", price)
     expect(await waffle.provider.getBalance(memento.address)).to.equal(0);
 
-    await memento.payToMint(user.address, hash, {value: price});
+    await memento.payToMint(user.address, hash, { value: price });
     expect(await memento.supply()).to.equal(1);
     expect(await waffle.provider.getBalance(memento.address)).to.equal(price);
   });
@@ -76,9 +80,9 @@ describe("Test Mint", function () {
     expect(await memento.supply()).to.equal(1);
   });
 
-  it("Test mint fail insufficient fund", async function() {
+  it("Test mint fail insufficient fund", async function () {
     const price = await memento.price();
-    await expect(memento.connect(user).payToMint(user.address, hash, {value: price.sub(1)}))
+    await expect(memento.connect(user).payToMint(user.address, hash, { value: price.sub(1) }))
       .to.be.revertedWith("Insufficient fund!");
   });
 

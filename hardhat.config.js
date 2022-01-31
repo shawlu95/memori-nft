@@ -1,5 +1,4 @@
 require("dotenv").config();
-
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
@@ -7,6 +6,7 @@ require("hardhat-gas-reporter");
 require("solidity-coverage");
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');
+require("hardhat-erc1820");
 
 const { types } = require("hardhat/config");
 
@@ -16,6 +16,10 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   for (const account of accounts) {
     console.log(account.address);
   }
+});
+
+task("accounts2", "Prints accounts", async (_, { web3 }) => {
+  console.log(await web3.eth.getAccounts());
 });
 
 task("balance", "Prints an account's balance")
@@ -77,6 +81,6 @@ module.exports = {
     currency: "USD",
   },
   contractSizer: {
-    except: ['contracts/MementoV2.sol']
+    except: ['contracts/MementoV2.sol', 'contracts/Memo.sol']
   }
 };

@@ -1,10 +1,13 @@
 const { expect } = require("chai");
 const { ethers, waffle, upgrades } = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 describe("Test proxy", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
   const IPFS = 'ipfs://';
+  const price = "10000000000000000000";
+  const reward = 0;
 
   let memento;
   let owner;
@@ -14,7 +17,7 @@ describe("Test proxy", function () {
     [owner, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await upgrades.deployProxy(Memento, []);
+    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Test upgrade proxy", async function () {
@@ -27,7 +30,7 @@ describe("Test proxy", function () {
     expect(await memento.ownerOf(0)).to.equal(owner.address);
 
     expect(await memento.name()).to.equal("Memento Script Betas");
-    
+
     const MementoV2 = await ethers.getContractFactory("MementoV2");
     const mementoV2 = await upgrades.upgradeProxy(memento.address, MementoV2);
 

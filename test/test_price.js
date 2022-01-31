@@ -1,11 +1,15 @@
 const { expect } = require("chai");
 const { ethers, waffle, upgrades } = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 describe("Test Price", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
-  let oldPrice;
+  const price = "10000000000000000000";
   const newPrice = 10 ** 9;
+  const reward = 0;
+
+  let oldPrice;
 
   let memento;
   let owner, admin, finance, user;
@@ -14,16 +18,16 @@ describe("Test Price", function () {
     [owner, admin, finance, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await upgrades.deployProxy(Memento, []);
+    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
     oldPrice = await memento.price();
   });
 
   it("Test set price by default admin", async function () {
-    await memento.payToMint(user.address, hash, {"value": oldPrice});
+    await memento.payToMint(user.address, hash, { "value": oldPrice });
     expect(await waffle.provider.getBalance(memento.address)).to.equal(oldPrice);
 
     await memento.setPrice(newPrice);
-    await memento.payToMint(user.address, hash2, {"value": newPrice});
+    await memento.payToMint(user.address, hash2, { "value": newPrice });
     expect(await memento.price()).to.equal(newPrice);
     expect(await waffle.provider.getBalance(memento.address)).to.equal(oldPrice.add(newPrice));
   });
@@ -49,7 +53,7 @@ describe("Test Price", function () {
 
   it("Test reject non-owner trying to set price", async function () {
     await expect(memento.connect(user).setPrice(newPrice))
-        .to.be.reverted;
+      .to.be.reverted;
   });
 
   after(async function () {

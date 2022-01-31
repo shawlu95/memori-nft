@@ -1,9 +1,12 @@
 const { expect } = require("chai");
 const { ethers, waffle, upgrades } = require("hardhat");
+const { constants } = require('@openzeppelin/test-helpers');
 
 describe("Test Pause", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
+  const price = "10000000000000000000";
+  const reward = 0;
 
   let memento;
   let owner;
@@ -14,7 +17,7 @@ describe("Test Pause", function () {
     [owner, pauser, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
-    memento = await upgrades.deployProxy(Memento, []);
+    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Test pause by non-admin", async function () {
@@ -58,7 +61,7 @@ describe("Test Pause", function () {
     expect(await memento.paused()).to.equal(true);
 
     await expect(memento.connect(owner).mint(owner.address, owner.address, hash)).to.be.reverted;
-    await expect(memento.connect(user).payToMint(user.address, hash2, {value: price})).to.be.reverted;
+    await expect(memento.connect(user).payToMint(user.address, hash2, { value: price })).to.be.reverted;
     await expect(memento.connect(user).transferFrom(user.address, owner.address, 0)).to.be.reverted;
     await expect(memento.burn(0)).to.be.reverted;
   });
@@ -77,8 +80,8 @@ describe("Test Pause", function () {
     const mint = await memento.connect(owner).mint(owner.address, owner.address, hash);
     mint.wait();
     expect(await memento.ownerOf(0)).to.equal(owner.address);
-    
-    const payToMint = await memento.connect(user).payToMint(user.address, hash2, {value: price});
+
+    const payToMint = await memento.connect(user).payToMint(user.address, hash2, { value: price });
     payToMint.wait();
     expect(await memento.ownerOf(1)).to.equal(user.address);
 
