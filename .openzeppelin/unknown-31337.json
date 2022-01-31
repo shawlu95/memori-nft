@@ -7,7 +7,7 @@
       "hash": "0xaa77fa80b818028ee2968bb4dfdb3efb8f9e3d5cf86e92eda9546fcdcf18ffef",
       "type": 2,
       "accessList": [],
-      "blockHash": "0x3cc49e124d6bdcf1721aaa9f5121be7c4167d2eaba174a12afbf6fd6facda0e6",
+      "blockHash": "0xb04e409e501956a1d627281f572f3cfb4363774fc4ca90a3300a41b41d44cd97",
       "blockNumber": 2,
       "transactionIndex": 0,
       "confirmations": 1,
@@ -830,7 +830,7 @@
     },
     "c540e6c3175f6516f9abbc0ac42f814cf1810188b5836a39844b36041c5c731c": {
       "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-      "txHash": "0x07a1cdb37b9806ad8714ba3c418405455ea5f4c4ca5922d350b1a62390255386",
+      "txHash": "0xd1171f367e87c643d4e76bea5406ec9106f50d43250805d42272058e79163f39",
       "layout": {
         "storage": [
           {
@@ -939,43 +939,43 @@
             "contract": "Memento",
             "label": "minted",
             "type": "t_struct(Counter)2330_storage",
-            "src": "contracts/Memento.sol:13"
+            "src": "contracts/Memento.sol:18"
           },
           {
             "contract": "Memento",
             "label": "burned",
             "type": "t_struct(Counter)2330_storage",
-            "src": "contracts/Memento.sol:14"
+            "src": "contracts/Memento.sol:19"
           },
           {
             "contract": "Memento",
             "label": "price",
             "type": "t_uint256",
-            "src": "contracts/Memento.sol:15"
+            "src": "contracts/Memento.sol:20"
           },
           {
             "contract": "Memento",
             "label": "_ipfsHash",
             "type": "t_mapping(t_bytes32,t_bool)",
-            "src": "contracts/Memento.sol:16"
+            "src": "contracts/Memento.sol:21"
           },
           {
             "contract": "Memento",
             "label": "_authors",
             "type": "t_mapping(t_uint256,t_address)",
-            "src": "contracts/Memento.sol:17"
+            "src": "contracts/Memento.sol:22"
           },
           {
             "contract": "Memento",
             "label": "_allowance",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/Memento.sol:18"
+            "src": "contracts/Memento.sol:23"
           },
           {
             "contract": "Memento",
             "label": "__gap",
             "type": "t_array(t_uint256)48_storage",
-            "src": "contracts/Memento.sol:159"
+            "src": "contracts/Memento.sol:179"
           }
         ],
         "types": {

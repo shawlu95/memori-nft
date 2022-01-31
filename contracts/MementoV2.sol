@@ -1,13 +1,18 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-contract MementoV2 is Initializable, AccessControlUpgradeable, ERC721URIStorageUpgradeable, PausableUpgradeable {
+contract MementoV2 is
+    Initializable,
+    AccessControlUpgradeable,
+    ERC721URIStorageUpgradeable,
+    PausableUpgradeable
+{
     using Counters for Counters.Counter;
 
     Counters.Counter private minted;
@@ -42,11 +47,15 @@ contract MementoV2 is Initializable, AccessControlUpgradeable, ERC721URIStorageU
     }
 
     function supply() public view returns (uint256) {
-        return minted.current() - burned.current(); 
+        return minted.current() - burned.current();
     }
 
     function authorOf(uint256 tokenId) public view virtual returns (address) {
         return _authors[tokenId];
+    }
+
+    function allowanceOf(address _user) public view returns (uint256) {
+        return _allowance[_user];
     }
 
     function makeURI(string memory CID) internal pure returns (string memory) {
@@ -66,18 +75,6 @@ contract MementoV2 is Initializable, AccessControlUpgradeable, ERC721URIStorageU
     function isMinted(string memory tokenURI) public view returns (bool) {
         bytes32 byteURI = getByte32(tokenURI);
         return _ipfsHash[byteURI];
-    }
-
-    function setPrice(uint256 _price) public onlyRole(FINANCE_ROLE) {
-        price = _price;
-    }
-
-    function setAllowance(address _user, uint256 _allowed) public onlyRole(FINANCE_ROLE) {
-        _allowance[_user] = _allowed;
-    }
-
-    function allowanceOf(address _user) public view returns (uint256) {
-        return _allowance[_user];
     }
 
     function mint(
@@ -131,17 +128,39 @@ contract MementoV2 is Initializable, AccessControlUpgradeable, ERC721URIStorageU
         payable(msg.sender).transfer(amount);
     }
 
-    function setRoleAdmin(bytes32 role, bytes32 adminRole) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setRoleAdmin(bytes32 role, bytes32 adminRole)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
         _setRoleAdmin(role, adminRole);
     }
 
-    function pause() public onlyRole(PAUSER_ROLE) { _pause(); }
+    function setPrice(uint256 _price) public onlyRole(FINANCE_ROLE) {
+        price = _price;
+    }
 
-    function unpause() public onlyRole(PAUSER_ROLE) { _unpause(); }
+    function setAllowance(address _user, uint256 _allowed)
+        public
+        onlyRole(FINANCE_ROLE)
+    {
+        _allowance[_user] = _allowed;
+    }
+
+    function pause() public onlyRole(PAUSER_ROLE) {
+        _pause();
+    }
+
+    function unpause() public onlyRole(PAUSER_ROLE) {
+        _unpause();
+    }
 
     function burn(uint256 tokenId) public {
         require(!paused(), "Burnwhile paused!");
-        require(hasRole(BURNER_ROLE, _msgSender()) || ownerOf(tokenId) == _msgSender(), "Not burner or owner!");
+        require(
+            hasRole(BURNER_ROLE, _msgSender()) ||
+                ownerOf(tokenId) == _msgSender(),
+            "Not burner or owner!"
+        );
         _burn(tokenId);
         delete _authors[tokenId];
         burned.increment();
@@ -156,5 +175,6 @@ contract MementoV2 is Initializable, AccessControlUpgradeable, ERC721URIStorageU
     {
         return super.supportsInterface(interfaceId);
     }
+
     uint256[48] private __gap;
 }
