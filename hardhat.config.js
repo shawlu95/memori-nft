@@ -6,6 +6,7 @@ require("@nomiclabs/hardhat-web3");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 require('@openzeppelin/hardhat-upgrades');
+require('hardhat-contract-sizer');
 
 const { types } = require("hardhat/config");
 
@@ -24,7 +25,7 @@ task("balance", "Prints an account's balance")
     const balance = await web3.eth.getBalance(account);
 
     console.log(web3.utils.fromWei(balance, "ether"), "ETH");
-});
+  });
 
 module.exports = {
   defaultNetwork: "hardhat",
@@ -33,9 +34,11 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 1000,
+        runs: 1,
       },
+      evmVersion: "byzantium"
     },
+
   },
   networks: {
     ganache: {
@@ -63,16 +66,19 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
-        mainnet: process.env.ETHERSCAN_TOKEN,
-        rinkeby: process.env.ETHERSCAN_TOKEN,
-        bsc: process.env.BSCSCAN_TOKEN,
-        bscTestnet: process.env.BSCSCAN_TOKEN,
-        polygon: process.env.POLYGONSCAN_TOKEN,
-        polygonMumbai: process.env.POLYGONSCAN_TOKEN
+      mainnet: process.env.ETHERSCAN_TOKEN,
+      rinkeby: process.env.ETHERSCAN_TOKEN,
+      bsc: process.env.BSCSCAN_TOKEN,
+      bscTestnet: process.env.BSCSCAN_TOKEN,
+      polygon: process.env.POLYGONSCAN_TOKEN,
+      polygonMumbai: process.env.POLYGONSCAN_TOKEN
     }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
+  },
+  contractSizer: {
+    except: ['contracts/MementoV2.sol']
   }
 };

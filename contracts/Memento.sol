@@ -155,7 +155,7 @@ contract Memento is
     }
 
     function burn(uint256 tokenId) public {
-        require(!paused(), "Burnwhile paused!");
+        require(!paused(), "Burn while paused!");
         require(
             hasRole(BURNER_ROLE, _msgSender()) ||
                 ownerOf(tokenId) == _msgSender(),
