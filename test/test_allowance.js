@@ -6,27 +6,48 @@ describe("Test Allowance", function () {
   const IPFS = 'ipfs://';
 
   let memento;
-  let owner;
-  let user;
+  let owner, admin, finance, user;
 
   beforeEach(async function () {
-    [owner, user] = await ethers.getSigners();
+    [owner, admin, finance, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
     memento = await upgrades.deployProxy(Memento, []);
   });
 
-  it("Test owner set allowance", async function () {
-    await memento.setAllowance(owner.address, 5);
+  it("Test set allowance by default admin", async function () {
+    await memento.connect(owner).setAllowance(owner.address, 5);
     expect(await memento.allowanceOf(owner.address)).to.equal(5);
 
-    await memento.setAllowance(user.address, 10);
+    await memento.connect(owner).setAllowance(user.address, 10);
+    expect(await memento.allowanceOf(user.address)).to.equal(10);
+  });
+
+  it("Test set allowance by finance role", async function () {
+    const FINANCE_ROLE = await memento.FINANCE_ROLE();
+    const ADMIN_ROLE = await memento.ADMIN_ROLE();
+    const setRoleAdmin = await memento.connect(owner).setRoleAdmin(FINANCE_ROLE, ADMIN_ROLE);
+    setRoleAdmin.wait();
+
+    const grantAdminRole = await memento.connect(owner).grantRole(ADMIN_ROLE, admin.address);
+    grantAdminRole.wait();
+
+    const grantFinanceRole = await memento.connect(admin).grantRole(FINANCE_ROLE, finance.address);
+    grantFinanceRole.wait();
+
+    await expect(memento.connect(admin).setAllowance(admin.address, 10)).to.be.reverted;
+    expect(await memento.allowanceOf(admin.address)).to.equal(0);
+
+    await memento.connect(finance).setAllowance(owner.address, 5);
+    expect(await memento.allowanceOf(owner.address)).to.equal(5);
+
+    await memento.connect(finance).setAllowance(user.address, 10);
     expect(await memento.allowanceOf(user.address)).to.equal(10);
   });
 
   it("Test reject non-owner trying to set allowance", async function () {
     await expect(memento.connect(user).setAllowance(user.address, 5))
-        .to.be.revertedWith("Ownable: caller is not the owner");
+        .to.be.reverted;
   });
 
   it("Test mint with allowance", async function() {
@@ -45,5 +66,5 @@ describe("Test Allowance", function () {
     const balance = await waffle.provider.getBalance(memento.address);
     const tx = await memento.withdraw(balance);
     tx.wait();
-  })
+  });
 });

@@ -42,5 +42,5 @@ describe("Test Airdrop", function () {
     const balance = await waffle.provider.getBalance(memento.address);
     const tx = await memento.withdraw(balance);
     tx.wait();
-  })
+  });
 });

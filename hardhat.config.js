@@ -61,9 +61,6 @@ module.exports = {
       accounts: [process.env.ADMIN_PRIVATE_KEY]
     }
   },
-  // etherscan: {
-  //   apiKey: process.env.POLYGONSCAN_TOKEN
-  // },
   etherscan: {
     apiKey: {
         mainnet: process.env.ETHERSCAN_TOKEN,

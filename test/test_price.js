@@ -4,22 +4,21 @@ const { ethers, waffle, upgrades } = require("hardhat");
 describe("Test Price", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
+  let oldPrice;
   const newPrice = 10 ** 9;
 
   let memento;
-  let owner;
-  let user;
+  let owner, admin, finance, user;
 
   beforeEach(async function () {
-    [owner, user] = await ethers.getSigners();
+    [owner, admin, finance, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
     memento = await upgrades.deployProxy(Memento, []);
+    oldPrice = await memento.price();
   });
 
-  it("Test owner set price", async function () {
-    const oldPrice = await memento.price();
-
+  it("Test set price by default admin", async function () {
     await memento.payToMint(user.address, hash, {"value": oldPrice});
     expect(await waffle.provider.getBalance(memento.address)).to.equal(oldPrice);
 
@@ -29,14 +28,33 @@ describe("Test Price", function () {
     expect(await waffle.provider.getBalance(memento.address)).to.equal(oldPrice.add(newPrice));
   });
 
+  it("Test set price by finance role", async function () {
+    const FINANCE_ROLE = await memento.FINANCE_ROLE();
+    const ADMIN_ROLE = await memento.ADMIN_ROLE();
+    const setRoleAdmin = await memento.connect(owner).setRoleAdmin(FINANCE_ROLE, ADMIN_ROLE);
+    setRoleAdmin.wait();
+
+    const grantAdminRole = await memento.connect(owner).grantRole(ADMIN_ROLE, admin.address);
+    grantAdminRole.wait();
+
+    const grantFinanceRole = await memento.connect(admin).grantRole(FINANCE_ROLE, finance.address);
+    grantFinanceRole.wait();
+
+    await expect(memento.connect(admin).setPrice(newPrice)).to.be.reverted;
+    expect(await memento.price()).to.equal(oldPrice);
+
+    await memento.connect(finance).setPrice(newPrice);
+    expect(await memento.price()).to.equal(newPrice);
+  });
+
   it("Test reject non-owner trying to set price", async function () {
     await expect(memento.connect(user).setPrice(newPrice))
-        .to.be.revertedWith("Ownable: caller is not the owner");
+        .to.be.reverted;
   });
 
   after(async function () {
     const balance = await waffle.provider.getBalance(memento.address);
     const tx = await memento.withdraw(balance);
     tx.wait();
-  })
+  });
 });

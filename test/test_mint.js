@@ -11,7 +11,7 @@ describe("Test Mint", function () {
   let user;
 
   beforeEach(async function () {
-    [owner, user] = await ethers.getSigners();
+    [owner, minter, user] = await ethers.getSigners();
 
     const Memento = await ethers.getContractFactory("Memento");
     memento = await upgrades.deployProxy(Memento, []);
@@ -31,6 +31,18 @@ describe("Test Mint", function () {
     expect(await memento.tokenURI(1)).to.equal(IPFS + hash2);
     expect(await memento.authorOf(1)).to.equal(owner.address);
     expect(await memento.ownerOf(1)).to.equal(owner.address);
+  });
+
+  it("Test mint by minter", async function () {
+    const minterRole = await memento.MINTER_ROLE();
+    expect(await memento.hasRole(minterRole, minter.address)).to.equal(false);
+    const grantRole = await memento.connect(owner).grantRole(minterRole, minter.address);
+    grantRole.wait();
+    expect(await memento.hasRole(minterRole, minter.address)).to.equal(true); 
+
+    await memento.connect(minter).mint(minter.address, minter.address, hash);
+    expect(await memento.supply()).to.equal(1);
+    expect(await memento.ownerOf(0)).to.equal(minter.address);
   });
 
   it("Test reject duplicate hash", async function () {
@@ -55,10 +67,13 @@ describe("Test Mint", function () {
     expect(await waffle.provider.getBalance(memento.address)).to.equal(price);
   });
 
-  it("Test mint fail non-owner", async function () {
+  it("Test mint fail non-admin/minter", async function () {
     const [owner, user] = await ethers.getSigners();
     await expect(memento.connect(user).mint(user.address, user.address, hash))
-      .to.be.revertedWith("Ownable: caller is not the owner");
+      .to.be.reverted;
+
+    await memento.connect(owner).mint(owner.address, owner.address, hash);
+    expect(await memento.supply()).to.equal(1);
   });
 
   it("Test mint fail insufficient fund", async function() {
