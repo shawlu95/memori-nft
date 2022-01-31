@@ -26,13 +26,13 @@ describe("Test Transaction", function () {
     expect(await memento.supply()).to.equal(1);
     expect(await waffle.provider.getBalance(memento.address)).to.equal(price);
 
-    await memento.connect(owner).withdraw(price);
+    await memento.connect(owner).withdrawEther(price);
     expect(await waffle.provider.getBalance(memento.address)).to.equal(0);
   });
 
   after(async function () {
     const balance = await waffle.provider.getBalance(memento.address);
-    const tx = await memento.withdraw(balance);
+    const tx = await memento.withdrawEther(balance);
     tx.wait();
   });
 });

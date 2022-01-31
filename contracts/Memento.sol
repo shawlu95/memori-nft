@@ -18,19 +18,15 @@ contract Memento is
     IERC777RecipientUpgradeable
 {
     using Counters for Counters.Counter;
-
     IERC1820RegistryUpgradeable private _erc1820;
-
     ERC777Upgradeable private _token;
-
-    Counters.Counter private minted;
-    Counters.Counter private burned;
+    Counters.Counter private _minted;
+    Counters.Counter private _burned;
     uint256 public price;
     uint256 public reward;
     mapping(bytes32 => bool) private _ipfsHash;
     mapping(uint256 => address) private _authors;
     mapping(address => uint256) private _allowance;
-
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
@@ -61,7 +57,7 @@ contract Memento is
         address token
     ) public initializer {
         __ERC165_init_unchained();
-        __ERC721_init_unchained("Memento Script Betas", "MEMO");
+        __ERC721_init_unchained("Memento Script Beta 2.2", "MEMENTO");
         __Context_init_unchained();
         __AccessControl_init_unchained();
         __ERC721URIStorage_init_unchained();
@@ -78,7 +74,6 @@ contract Memento is
         _erc1820 = IERC1820RegistryUpgradeable(
             0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
         );
-
         _erc1820.setInterfaceImplementer(
             address(this),
             keccak256("ERC777TokensRecipient"),
@@ -90,11 +85,11 @@ contract Memento is
     }
 
     function supply() public view returns (uint256) {
-        return minted.current() - burned.current();
+        return _minted.current() - _burned.current();
     }
 
     function authorOf(uint256 tokenId) public view virtual returns (address) {
-        require(_exists(tokenId), "ERC721: author query for nonexistent token");
+        require(_exists(tokenId), "ERC721: nonexistent token");
         return _authors[tokenId];
     }
 
@@ -153,12 +148,12 @@ contract Memento is
     ) internal {
         bytes32 byteURI = getByte32(tokenURI);
         require(_ipfsHash[byteURI] == false, "Already minted!");
-        uint256 id = minted.current();
+        uint256 id = _minted.current();
         _safeMint(recipient, id);
         _setTokenURI(id, makeURI(tokenURI));
         _authors[id] = author;
         _ipfsHash[byteURI] = true;
-        minted.increment();
+        _minted.increment();
     }
 
     function _beforeTokenTransfer(
@@ -166,11 +161,11 @@ contract Memento is
         address to,
         uint256 amount
     ) internal virtual override {
-        require(!paused(), "Token transfer while paused!");
+        require(!paused(), "Transfer while paused!");
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    function withdraw(uint256 amount) public onlyRole(FINANCE_ROLE) {
+    function withdrawEther(uint256 amount) public onlyRole(FINANCE_ROLE) {
         require(amount <= address(this).balance, "Insufficient fund!");
         payable(_msgSender()).transfer(amount);
         emit WithdrawEther(_msgSender(), amount);
@@ -231,7 +226,7 @@ contract Memento is
         );
         _burn(tokenId);
         delete _authors[tokenId];
-        burned.increment();
+        _burned.increment();
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -252,10 +247,7 @@ contract Memento is
         bytes calldata userData,
         bytes calldata operatorData
     ) external override {
-        require(
-            msg.sender == address(_token),
-            "Simple777Recipient: Invalid token"
-        );
+        require(msg.sender == address(_token), "Invalid token!");
         emit ReceivedToken(operator, from, to, amount, userData, operatorData);
     }
 

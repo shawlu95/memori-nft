@@ -29,8 +29,6 @@ describe("Test proxy", function () {
     expect(await memento.authorOf(0)).to.equal(owner.address);
     expect(await memento.ownerOf(0)).to.equal(owner.address);
 
-    expect(await memento.name()).to.equal("Memento Script Betas");
-
     const MementoV2 = await ethers.getContractFactory("MementoV2");
     const mementoV2 = await upgrades.upgradeProxy(memento.address, MementoV2);
 
@@ -44,7 +42,7 @@ describe("Test proxy", function () {
 
   after(async function () {
     const balance = await waffle.provider.getBalance(memento.address);
-    const tx = await memento.withdraw(balance);
+    const tx = await memento.withdrawEther(balance);
     tx.wait();
   });
 });

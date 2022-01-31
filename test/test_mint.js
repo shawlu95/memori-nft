@@ -88,7 +88,7 @@ describe("Test Mint", function () {
 
   after(async function () {
     const balance = await waffle.provider.getBalance(memento.address);
-    const tx = await memento.withdraw(balance);
+    const tx = await memento.withdrawEther(balance);
     tx.wait();
   })
 });
