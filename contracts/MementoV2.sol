@@ -28,6 +28,14 @@ contract MementoV2 is
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     bytes32 public constant FINANCE_ROLE = keccak256("FINANCE_ROLE");
 
+    event SetAllowance(
+        address indexed by,
+        address indexed recipient,
+        uint256 allowance
+    );
+    event SetPrice(address indexed by, uint256 price);
+    event WithdrawFund(address indexed by, uint256 amount);
+
     function initialize() public initializer {
         __ERC165_init_unchained();
         __ERC721_init_unchained("Memento Script Betas", "MEMO");
@@ -51,6 +59,7 @@ contract MementoV2 is
     }
 
     function authorOf(uint256 tokenId) public view virtual returns (address) {
+        require(_exists(tokenId), "ERC721: author query for nonexistent token");
         return _authors[tokenId];
     }
 
@@ -91,12 +100,12 @@ contract MementoV2 is
         payable
     {
         require(!paused(), "Pay to mint while paused!");
-        if (_allowance[msg.sender] > 0) {
-            _allowance[msg.sender] -= 1;
+        if (_allowance[_msgSender()] > 0) {
+            _allowance[_msgSender()] -= 1;
         } else {
             require(msg.value >= price, "Insufficient fund!");
         }
-        _execMint(recipient, msg.sender, tokenURI);
+        _execMint(recipient, _msgSender(), tokenURI);
     }
 
     function _execMint(
@@ -125,7 +134,8 @@ contract MementoV2 is
 
     function withdraw(uint256 amount) public onlyRole(FINANCE_ROLE) {
         require(amount <= address(this).balance, "Insufficient fund!");
-        payable(msg.sender).transfer(amount);
+        payable(_msgSender()).transfer(amount);
+        emit WithdrawFund(_msgSender(), amount);
     }
 
     function setRoleAdmin(bytes32 role, bytes32 adminRole)
@@ -137,6 +147,7 @@ contract MementoV2 is
 
     function setPrice(uint256 _price) public onlyRole(FINANCE_ROLE) {
         price = _price;
+        emit SetPrice(_msgSender(), _price);
     }
 
     function setAllowance(address _user, uint256 _allowed)
@@ -144,6 +155,7 @@ contract MementoV2 is
         onlyRole(FINANCE_ROLE)
     {
         _allowance[_user] = _allowed;
+        emit SetAllowance(_msgSender(), _user, _allowed);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {

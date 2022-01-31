@@ -26,7 +26,7 @@ describe("Test Burn", function () {
     expect(await memento.tokenURI(0)).to.equal(IPFS + hash0);
     expect(await memento.authorOf(0)).to.equal(owner.address);
     expect(await memento.ownerOf(0)).to.equal(owner.address);
-    
+
     expect(await memento.tokenURI(1)).to.equal(IPFS + hash1);
     expect(await memento.authorOf(1)).to.equal(owner.address);
     expect(await memento.ownerOf(1)).to.equal(user.address);
@@ -38,10 +38,10 @@ describe("Test Burn", function () {
 
     expect(await memento.supply()).to.equal(1);
 
-    // expect(await memento.tokenURI(0)).to.be.reverted;
-    // expect(await memento.authorOf(0)).to.equal(owner.address);
-    // expect(await memento.ownerOf(0)).to.be.reverted;
-    
+    await expect(memento.tokenURI(0)).to.be.reverted;
+    await expect(memento.authorOf(0)).to.be.reverted;
+    await expect(memento.ownerOf(0)).to.be.reverted;
+
     expect(await memento.tokenURI(1)).to.equal(IPFS + hash1);
     expect(await memento.authorOf(1)).to.equal(owner.address);
     expect(await memento.ownerOf(1)).to.equal(user.address);
@@ -50,15 +50,15 @@ describe("Test Burn", function () {
   it("Test burn by owner", async function () {
     const burn = await memento.connect(user).burn(1);
     burn.wait();
-    
+
     expect(await memento.supply()).to.equal(1);
 
     expect(await memento.tokenURI(0)).to.equal(IPFS + hash0);
     expect(await memento.authorOf(0)).to.equal(owner.address);
     expect(await memento.ownerOf(0)).to.equal(owner.address);
-    
-    // expect(await memento.tokenURI(1)).to.equal(IPFS + hash1);
-    // expect(await memento.authorOf(1)).to.equal(owner.address);
-    // expect(await memento.ownerOf(1)).to.equal(user.address);
+
+    await expect(memento.tokenURI(1)).to.be.reverted;
+    await expect(memento.authorOf(1)).to.be.reverted;
+    await expect(memento.ownerOf(1)).to.be.reverted;
   });
 });
