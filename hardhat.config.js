@@ -8,7 +8,7 @@ require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');
 require("hardhat-erc1820");
 
-const { types } = require("hardhat/config");
+const { types, task } = require("hardhat/config");
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -27,8 +27,26 @@ task("balance", "Prints an account's balance")
   .setAction(async (args) => {
     const account = web3.utils.toChecksumAddress(args.account);
     const balance = await web3.eth.getBalance(account);
-
     console.log(web3.utils.fromWei(balance, "ether"), "ETH");
+  });
+
+// example: hh list --network rinkeby --address 0x84725B0E283E873105f93B0762257e44c0b16295
+task("list", "List all nfts of a proxy address")
+  .addParam("address", "Contract proxy address")
+  .setAction(async (args, hre) => {
+    const [owner] = await hre.ethers.getSigners();
+    console.log("Current account:", owner.address);
+    console.log("NFT address:", args.address);
+
+    const Memento = await ethers.getContractFactory("Memento");
+    const memento = await Memento.attach(args.address);
+    const supply = await memento.supply();
+    for (let i = 0; i < supply; i++) {
+      let owner = await memento.ownerOf(i);
+      let author = await memento.authorOf(i);
+      let uri = await memento.tokenURI(i);
+      console.log(`ID ${i}. Author ${author}. Owner ${owner}. URI ${uri}`);
+    }
   });
 
 module.exports = {
