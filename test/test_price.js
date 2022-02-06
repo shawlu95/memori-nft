@@ -17,17 +17,17 @@ describe("Test Price", function () {
   beforeEach(async function () {
     [owner, admin, finance, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory("Memento");
+    const Memento = await ethers.getContractFactory("MementoV2");
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
     oldPrice = await memento.price();
   });
 
   it("Test set price by default admin", async function () {
-    await memento.payToMint(user.address, hash, { "value": oldPrice });
+    await memento.payToMint(user.address, 0, hash, hash, { "value": oldPrice });
     expect(await waffle.provider.getBalance(memento.address)).to.equal(oldPrice);
 
     await memento.setPrice(newPrice);
-    await memento.payToMint(user.address, hash2, { "value": newPrice });
+    await memento.payToMint(user.address, 0, hash2, hash2, { "value": newPrice });
     expect(await memento.price()).to.equal(newPrice);
     expect(await waffle.provider.getBalance(memento.address)).to.equal(oldPrice.add(newPrice));
   });

@@ -16,7 +16,7 @@ describe("Test Pause", function () {
   beforeEach(async function () {
     [owner, pauser, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory("Memento");
+    const Memento = await ethers.getContractFactory("MementoV2");
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
@@ -60,8 +60,8 @@ describe("Test Pause", function () {
     pause.wait();
     expect(await memento.paused()).to.equal(true);
 
-    await expect(memento.connect(owner).mint(owner.address, owner.address, hash)).to.be.reverted;
-    await expect(memento.connect(user).payToMint(user.address, hash2, { value: price })).to.be.reverted;
+    await expect(memento.connect(owner).mint(owner.address, owner.address, 0, hash, hash)).to.be.reverted;
+    await expect(memento.connect(user).payToMint(user.address, 0, hash2, hash2, { value: price })).to.be.reverted;
     await expect(memento.connect(user).transferFrom(user.address, owner.address, 0)).to.be.reverted;
     await expect(memento.burn(0)).to.be.reverted;
   });
@@ -77,11 +77,11 @@ describe("Test Pause", function () {
     unpause.wait();
     expect(await memento.paused()).to.equal(false);
 
-    const mint = await memento.connect(owner).mint(owner.address, owner.address, hash);
+    const mint = await memento.connect(owner).mint(owner.address, owner.address, 0, hash, hash);
     mint.wait();
     expect(await memento.ownerOf(0)).to.equal(owner.address);
 
-    const payToMint = await memento.connect(user).payToMint(user.address, hash2, { value: price });
+    const payToMint = await memento.connect(user).payToMint(user.address, 0, hash2, hash2, { value: price });
     payToMint.wait();
     expect(await memento.ownerOf(1)).to.equal(user.address);
 

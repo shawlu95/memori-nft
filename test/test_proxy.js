@@ -37,7 +37,7 @@ describe("Test proxy", function () {
     expect(await mementoV2.authorOf(0)).to.equal(owner.address);
     expect(await mementoV2.ownerOf(0)).to.equal(owner.address);
 
-    expect(await memento.name()).to.equal("Memento Script Betas");
+    expect(await memento.name()).to.equal("Memento Script Beta 2.2");
   });
 
   after(async function () {

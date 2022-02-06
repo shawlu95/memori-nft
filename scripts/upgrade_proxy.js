@@ -1,5 +1,3 @@
-
-
 const { ethers, upgrades } = require("hardhat");
 const hre = require("hardhat");
 // const ethers = hre.ethers;
@@ -7,7 +5,7 @@ const hre = require("hardhat");
 async function main() {
   await hre.run('compile');
 
-  const address = "0x06B7e365aFB064A9b499Ff0A26F39CF0C30e1424";
+  const address = "0x84725B0E283E873105f93B0762257e44c0b16295";
 
   const MementoV2 = await ethers.getContractFactory("MementoV2");
   const mementoV2 = await upgrades.upgradeProxy(address, MementoV2);

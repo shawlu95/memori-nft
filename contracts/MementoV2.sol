@@ -32,6 +32,8 @@ contract MementoV2 is
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     bytes32 public constant FINANCE_ROLE = keccak256("FINANCE_ROLE");
+    mapping(uint256 => string) private _previewURIs;
+    mapping(uint256 => uint256) private _revealAt;
 
     event SetAllowance(
         address indexed by,
@@ -57,7 +59,7 @@ contract MementoV2 is
         address token
     ) public initializer {
         __ERC165_init_unchained();
-        __ERC721_init_unchained("Memento Script Beta 2.3", "MEMENTO");
+        __ERC721_init_unchained("Memento Script Beta 2.2", "MEMENTO");
         __Context_init_unchained();
         __AccessControl_init_unchained();
         __ERC721URIStorage_init_unchained();
@@ -97,63 +99,89 @@ contract MementoV2 is
         return _allowance[_user];
     }
 
+    function revealAt(uint256 _tokenURI) public view returns (uint256) {
+        return _revealAt[_tokenURI];
+    }
+
     function makeURI(string memory CID) internal pure returns (string memory) {
         return string(abi.encodePacked("ipfs://", CID));
     }
 
-    function getByte32(string memory tokenURI)
+    function getByte32(string memory _tokenURI)
         internal
         pure
         returns (bytes32 result)
     {
         assembly {
-            result := mload(add(tokenURI, 32))
+            result := mload(add(_tokenURI, 32))
         }
     }
 
-    function isMinted(string memory tokenURI) public view returns (bool) {
-        bytes32 byteURI = getByte32(tokenURI);
+    function isMinted(string memory _tokenURI) public view returns (bool) {
+        bytes32 byteURI = getByte32(_tokenURI);
         return _ipfsHash[byteURI];
     }
 
     function mint(
-        address recipient,
-        address author,
-        string memory tokenURI
+        address _recipient,
+        address _author,
+        uint256 _reveal,
+        string memory _previewURI,
+        string memory _tokenURI
     ) public onlyRole(MINTER_ROLE) {
         require(!paused(), "Mint while paused!");
-        _execMint(recipient, author, tokenURI);
+        _execMint(_recipient, _author, _reveal, _previewURI, _tokenURI);
     }
 
-    function payToMint(address recipient, string memory tokenURI)
-        public
-        payable
-    {
+    function payToMint(
+        address _recipient,
+        uint256 _reveal,
+        string memory _previewURI,
+        string memory _tokenURI
+    ) public payable {
         require(!paused(), "Pay to mint while paused!");
         if (_allowance[_msgSender()] > 0) {
             _allowance[_msgSender()] -= 1;
         } else {
             require(msg.value >= price, "Insufficient fund!");
         }
-        _execMint(recipient, _msgSender(), tokenURI);
+        _execMint(_recipient, _msgSender(), _reveal, _previewURI, _tokenURI);
         if (reward > 0) {
             _token.send(_msgSender(), reward, "");
         }
     }
 
     function _execMint(
-        address recipient,
-        address author,
-        string memory tokenURI
+        address _recipient,
+        address _author,
+        uint256 _reveal,
+        string memory _previewURI,
+        string memory _tokenURI
     ) internal {
-        bytes32 byteURI = getByte32(tokenURI);
+        bytes32 byteURI = getByte32(_tokenURI);
         require(_ipfsHash[byteURI] == false, "Already minted!");
         uint256 id = _minted.current();
-        _safeMint(recipient, id);
-        _setTokenURI(id, makeURI(tokenURI));
-        _authors[id] = author;
+        _safeMint(_recipient, id);
+        _setTokenURI(id, makeURI(_tokenURI));
+        _previewURIs[id] = makeURI(_previewURI);
+        _revealAt[id] = _reveal;
+        _authors[id] = _author;
         _ipfsHash[byteURI] = true;
         _minted.increment();
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        if (_revealAt[tokenId] <= block.timestamp) {
+            return super.tokenURI(tokenId);
+        } else {
+            return _previewURIs[tokenId];
+        }
     }
 
     function _beforeTokenTransfer(

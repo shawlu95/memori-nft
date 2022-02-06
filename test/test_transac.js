@@ -14,7 +14,7 @@ describe("Test Transaction", function () {
   beforeEach(async function () {
     [owner, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory("Memento");
+    const Memento = await ethers.getContractFactory("MementoV2");
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
@@ -22,7 +22,7 @@ describe("Test Transaction", function () {
     const price = await memento.price();
     expect(await memento.provider.getBalance(memento.address)).to.equal(0);
 
-    await memento.connect(user).payToMint(user.address, hash, { value: price });
+    await memento.connect(user).payToMint(user.address, 0, hash, hash, { value: price });
     expect(await memento.supply()).to.equal(1);
     expect(await waffle.provider.getBalance(memento.address)).to.equal(price);
 

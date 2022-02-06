@@ -16,7 +16,7 @@ describe('Memo', function () {
     const Memo = await ethers.getContractFactory("Memo");
     token = await upgrades.deployProxy(Memo, ["Memo", "MEMO", totalSupply]);
 
-    const Memento = await ethers.getContractFactory("Memento");
+    const Memento = await ethers.getContractFactory("MementoV2");
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
@@ -55,7 +55,7 @@ describe('Memo', function () {
 
     expect(await token.balanceOf(memento.address)).to.equal(deposit);
 
-    await memento.connect(user).payToMint(user.address, hash, { value: price });
+    await memento.connect(user).payToMint(user.address, 0, hash, hash, { value: price });
 
     expect(await token.balanceOf(memento.address)).to.equal(deposit - 10);
     expect(await token.balanceOf(user.address)).to.equal(10);

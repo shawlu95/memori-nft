@@ -99,6 +99,6 @@ module.exports = {
     currency: "USD",
   },
   contractSizer: {
-    except: ['contracts/MementoV2.sol', 'contracts/Memo.sol']
+    except: ['contracts/Memento.sol', 'contracts/Memo.sol']
   }
 };

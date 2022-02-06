@@ -16,13 +16,13 @@ describe("Test Burn", function () {
   beforeEach(async function () {
     [owner, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory("Memento");
+    const Memento = await ethers.getContractFactory("MementoV2");
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
 
-    const mint0 = await memento.mint(owner.address, owner.address, hash0);
+    const mint0 = await memento.mint(owner.address, owner.address, 0, hash0, hash0);
     mint0.wait();
 
-    const mint1 = await memento.mint(user.address, owner.address, hash1);
+    const mint1 = await memento.mint(user.address, owner.address, 0, hash1, hash1);
     mint1.wait();
 
     expect(await memento.supply()).to.equal(2);

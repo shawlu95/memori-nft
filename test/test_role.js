@@ -13,7 +13,7 @@ describe("Test Role", function () {
   beforeEach(async function () {
     [owner, admin, minter, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory("Memento");
+    const Memento = await ethers.getContractFactory("MementoV2");
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
 
     ADMIN_ROLE = await memento.ADMIN_ROLE();

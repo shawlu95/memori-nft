@@ -14,7 +14,7 @@ describe("Test Allowance", function () {
   beforeEach(async function () {
     [owner, admin, finance, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory("Memento");
+    const Memento = await ethers.getContractFactory("MementoV2");
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
@@ -57,7 +57,7 @@ describe("Test Allowance", function () {
     await memento.setAllowance(user.address, 5);
     expect(await memento.allowanceOf(user.address)).to.equal(5);
 
-    await memento.connect(user).payToMint(user.address, hash, { "value": 0 });
+    await memento.connect(user).payToMint(user.address, 0, hash, hash, { "value": 0 });
     expect(await memento.allowanceOf(user.address)).to.equal(4);
     expect(await memento.supply()).to.equal(1);
     expect(await memento.tokenURI(0)).to.equal(IPFS + hash);
