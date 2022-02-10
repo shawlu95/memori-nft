@@ -22,7 +22,7 @@ async function main() {
   const memento = await upgrades.deployProxy(Memento, [price, reward, memo.address]);
   console.log("Memento deployed to:", memento.address);
   // in console, grab a handle of the nft
-  const nftAddress = address.getNftAddress();
+  // const nftAddress = address.getNftAddress();
   // const memento = await Memento.attach(nftAddress);
 
   // transfer balance to the NFT proxy contract
