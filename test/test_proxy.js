@@ -16,28 +16,27 @@ describe("Test proxy", function () {
   beforeEach(async function () {
     [owner, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory("Memento");
+    const Memento = await ethers.getContractFactory("MementoV2");
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Test upgrade proxy", async function () {
     expect(await memento.supply()).to.equal(0);
 
-    await memento.mint(owner.address, owner.address, hash);
+    await memento.mint(owner.address, owner.address, 0, hash, hash);
     expect(await memento.supply()).to.equal(1);
     expect(await memento.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memento.authorOf(0)).to.equal(owner.address);
     expect(await memento.ownerOf(0)).to.equal(owner.address);
 
-    const MementoV2 = await ethers.getContractFactory("MementoV2");
-    const mementoV2 = await upgrades.upgradeProxy(memento.address, MementoV2);
+    const MementoNew = await ethers.getContractFactory("MementoV3");
+    const mementoNew = await upgrades.upgradeProxy(memento.address, MementoNew);
 
-    expect(await mementoV2.supply()).to.equal(1);
-    expect(await mementoV2.tokenURI(0)).to.equal(IPFS + hash);
-    expect(await mementoV2.authorOf(0)).to.equal(owner.address);
-    expect(await mementoV2.ownerOf(0)).to.equal(owner.address);
-
-    expect(await memento.name()).to.equal("Memento Script Beta 2.2");
+    expect(await mementoNew.supply()).to.equal(1);
+    expect(await mementoNew.tokenURI(0)).to.equal(IPFS + hash);
+    expect(await mementoNew.authorOf(0)).to.equal(owner.address);
+    expect(await mementoNew.ownerOf(0)).to.equal(owner.address);
+    expect(await mementoNew.name()).to.equal("Memento Script Beta 2.2");
   });
 
   after(async function () {

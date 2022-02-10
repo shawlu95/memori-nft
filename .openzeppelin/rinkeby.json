@@ -537,13 +537,13 @@
           {
             "contract": "MementoV2",
             "label": "_minted",
-            "type": "t_struct(Counter)3865_storage",
+            "type": "t_struct(Counter)5598_storage",
             "src": "contracts/MementoV2.sol:23"
           },
           {
             "contract": "MementoV2",
             "label": "_burned",
-            "type": "t_struct(Counter)3865_storage",
+            "type": "t_struct(Counter)5598_storage",
             "src": "contracts/MementoV2.sol:24"
           },
           {
@@ -596,7 +596,7 @@
           "t_contract(ERC777Upgradeable)3020": {
             "label": "contract ERC777Upgradeable"
           },
-          "t_struct(Counter)3865_storage": {
+          "t_struct(Counter)5598_storage": {
             "label": "struct Counters.Counter",
             "members": [
               {

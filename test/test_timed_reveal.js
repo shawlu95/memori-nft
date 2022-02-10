@@ -16,7 +16,7 @@ describe("Test timed reveal", function () {
   beforeEach(async function () {
     [owner, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory("MementoV2");
+    const Memento = await ethers.getContractFactory("MementoV3");
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 

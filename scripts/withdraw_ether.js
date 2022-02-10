@@ -1,13 +1,13 @@
 const { ethers, waffle, upgrades } = require("hardhat");
 const hre = require("hardhat");
-// const ethers = hre.ethers;
+const address = require("./address");
 
 async function main() {
   await hre.run('compile');
   const [owner] = await ethers.getSigners();
-  const address = "0x84725B0E283E873105f93B0762257e44c0b16295";
+  const nftAddress = address.getNftAddress();
   const MementoV2 = await ethers.getContractFactory("MementoV2");
-  const memento = await MementoV2.attach(address);
+  const memento = await MementoV2.attach(nftAddress);
 
   const balance = await waffle.provider.getBalance(memento.address);
   (await memento.connect(owner).withdrawEther(balance)).wait();

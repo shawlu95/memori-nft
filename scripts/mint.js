@@ -2,11 +2,12 @@
 
 const { ethers, upgrades } = require("hardhat");
 const hre = require("hardhat");
+const address = require("./address");
 
 async function main() {
   await hre.run('compile');
   const [owner] = await ethers.getSigners();
-  const nftAddress = '0x84725B0E283E873105f93B0762257e44c0b16295';
+  const nftAddress = address.getNftAddress();
   const recipient = ethers.utils.getAddress('0xBe83329a94e96298C9eCBaaEb81094b42b294aeB');
   const Memento = await ethers.getContractFactory("Memento");
   const memento = Memento.attach(nftAddress);
@@ -14,7 +15,7 @@ async function main() {
   console.log("Name", await memento.name());
   console.log("Symbol", await memento.symbol());
 
-  const tokenAddress = '0x9824A6d079dE2eD925E5DbcE2C0c2E2D468b0705';
+  const tokenAddress = address.getTokenAddress();
   const Memo = await ethers.getContractFactory("Memo");
   const memo = Memo.attach(tokenAddress);
 
