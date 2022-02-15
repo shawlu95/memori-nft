@@ -6,8 +6,8 @@ async function main() {
   await hre.run('compile');
   const [owner] = await ethers.getSigners();
   const nftAddress = address.getNftAddress();
-  const MementoV2 = await ethers.getContractFactory("MementoV2");
-  const memento = await MementoV2.attach(nftAddress);
+  const Memento = await ethers.getContractFactory("MementoV3");
+  const memento = await Memento.attach(nftAddress);
 
   const balance = await waffle.provider.getBalance(memento.address);
   (await memento.connect(owner).withdrawEther(balance)).wait();

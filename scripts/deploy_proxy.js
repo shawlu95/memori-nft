@@ -18,7 +18,7 @@ async function main() {
 
   const price = "100000000000000000";
   const reward = "1000000000000000000";
-  const Memento = await ethers.getContractFactory("Memento");
+  const Memento = await ethers.getContractFactory("MementoV3");
   const memento = await upgrades.deployProxy(Memento, [price, reward, memo.address]);
   console.log("Memento deployed to:", memento.address);
   // in console, grab a handle of the nft

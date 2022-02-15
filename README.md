@@ -38,7 +38,16 @@ hardhat run --network ropsten scripts/deploy.js
 Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
 
 ```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
+# verify NFT contract
+npx hardhat verify \
+  --contract contracts/MementoV3.sol:MementoV3 \
+  --network polygonMumbai 0xF17C3836e0Ee846FA28eAb924ae4B1ee5781f68E
+
+# verify token contract
+npx hardhat verify \
+  --contract contracts/Memo.sol:Memo \
+  --constructor-args ./scripts/token_args.js \
+  --network polygonMumbai 0x7b9abF61186cF6d2E6BbC6130bEDb50FF690F8cA
 ```
 
 ```
