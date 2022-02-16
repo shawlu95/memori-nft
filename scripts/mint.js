@@ -6,8 +6,9 @@ const address = require("./address");
 
 async function main() {
   await hre.run('compile');
+  const chainId = hre.network.config.chainId;
   const [owner] = await ethers.getSigners();
-  const nftAddress = address.getNftAddress();
+  const nftAddress = address.getNftAddress(chainId);
   const recipient = ethers.utils.getAddress('0xBe83329a94e96298C9eCBaaEb81094b42b294aeB');
   const Memento = await ethers.getContractFactory("Memento");
   const memento = Memento.attach(nftAddress);

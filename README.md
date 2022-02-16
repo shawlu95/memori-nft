@@ -54,3 +54,7 @@ npx hardhat verify \
 hh size-contracts
 hh coverage
 ```
+
+### OpenSea
+* [Rinkeby](https://testnets.opensea.io/collection/memento-script-beta-2-2)
+* [Polygon Mumbai](https://testnets.opensea.io/collection/memento-script-beta-2-2-v2)

@@ -5,8 +5,8 @@ const hre = require("hardhat");
 const address = require("./address");
 
 async function main() {
-  console.log(address.getNftAddress())
-
+  const chainId = hre.network.config.chainId;
+  console.log(chainId, address.getNftAddress(chainId));
 }
 
 main().catch((error) => {
