@@ -2,6 +2,7 @@ const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers, waffle, upgrades } = require("hardhat");
 const { constants } = require('@openzeppelin/test-helpers');
+const { getVersion } = require('../scripts/address');
 
 describe("Test Mint", function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -16,7 +17,7 @@ describe("Test Mint", function () {
 
   beforeEach(async function () {
     [owner, minter, user] = await ethers.getSigners();
-    const Memento = await ethers.getContractFactory("MementoV3");
+    const Memento = await ethers.getContractFactory(getVersion());
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 

@@ -1,6 +1,7 @@
 const { ethers, upgrades } = require("hardhat");
 const { expect } = require('chai');
 const { constants } = require('@openzeppelin/test-helpers');
+const { getVersion } = require('../scripts/address');
 
 describe('Memo', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -16,7 +17,7 @@ describe('Memo', function () {
     const Memo = await ethers.getContractFactory("Memo");
     token = await Memo.deploy("Memo", "MEMO", totalSupply);
 
-    const Memento = await ethers.getContractFactory("MementoV3");
+    const Memento = await ethers.getContractFactory(getVersion());
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
   });
 

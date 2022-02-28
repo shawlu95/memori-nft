@@ -10,7 +10,10 @@ async function main() {
   const [owner] = await ethers.getSigners();
   const nftAddress = address.getNftAddress(chainId);
   const tokenAddress = address.getTokenAddress(chainId);
-  const Memento = await ethers.getContractFactory("MementoV3");
+  console.log('nftAddress:', nftAddress);
+  console.log('tokenAddress:', tokenAddress);
+
+  const Memento = await ethers.getContractFactory("MementoV4");
   const memento = await upgrades.upgradeProxy(nftAddress, Memento);
   console.log("Memento upgraded:", memento.address);
 
