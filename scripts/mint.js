@@ -1,30 +1,33 @@
-const { ethers, upgrades } = require("hardhat");
-const hre = require("hardhat");
-const address = require("./address");
+const { ethers, upgrades } = require('hardhat');
+const hre = require('hardhat');
+const { parseEther } = require('ethers/lib/utils');
+const address = require('./address');
 
 async function main() {
   await hre.run('compile');
   const chainId = hre.network.config.chainId;
   const [owner] = await ethers.getSigners();
   const nftAddress = address.getNftAddress(chainId);
-  const Memento = await ethers.getContractFactory("Memento");
-  const memento = Memento.attach(nftAddress);
-  const price = await memento.price();
+  const Memori = await ethers.getContractFactory('Memori');
+  const memori = Memori.attach(nftAddress);
+  const price = await memori.price();
   console.log('owner', owner.address);
-  console.log("Memento:", memento.address);
-  console.log("Name", await memento.name());
-  console.log("Price", price);
-  console.log("Symbol", await memento.symbol());
+  console.log('Memori:', memori.address);
+  console.log('Name', await memori.name());
+  console.log('Price', price);
+  console.log('Symbol', await memori.symbol());
 
-  const hash = 'QmScRachNaWvpsShc1UNwppBy27nRwdGUJLyPLAVcTsGFs';
-  const tx = await memento.payToMint(owner.address, 0, hash, hash, { value: "100000000000000000", gasLimit: 500000 });
+  const hash = 'QmZVqpCChRFsB89REPRY2ractznCv4KXsL6N4P1QYpZ4Mc';
+  const tx = await memori.mint(
+    owner.address, owner.address,
+    0, hash, hash, { gasLimit: 500000 });
 
   await tx.wait();
-  const supply = (await memento.supply()).toNumber();
-  console.log("Supply:", supply);
-  console.log("Newly minted:", await memento.tokenURI(supply - 1));
-  console.log("Author:", await memento.authorOf(supply - 1));
-  console.log("Owner:", await memento.ownerOf(supply - 1));
+  const supply = (await memori.supply()).toNumber();
+  console.log('Supply:', supply);
+  console.log('Newly minted:', await memori.tokenURI(supply - 1));
+  console.log('Author:', await memori.authorOf(supply - 1));
+  console.log('Owner:', await memori.ownerOf(supply - 1));
 }
 
 main().catch((error) => {

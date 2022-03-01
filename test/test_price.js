@@ -1,12 +1,14 @@
-const { expect } = require("chai");
-const { ethers, waffle, upgrades } = require("hardhat");
+const { expect } = require('chai');
+const { ethers, waffle, upgrades } = require('hardhat');
 const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
+const { keccak256 } = require('../scripts/util');
+const { parseEther } = require('ethers/lib/utils');
 
-describe("Test Price", function () {
+describe('Test Price', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
-  const price = "10000000000000000000";
+  const price = parseEther('0.1');
   const newPrice = 10 ** 9;
   const reward = 0;
 
@@ -23,19 +25,19 @@ describe("Test Price", function () {
     oldPrice = await memori.price();
   });
 
-  it("Test set price by default admin", async function () {
-    await memori.payToMint(user.address, 0, hash, hash, { "value": oldPrice });
+  it('Test set price by default admin', async function () {
+    await memori.payToMint(user.address, 0, hash, hash, { 'value': oldPrice });
     expect(await waffle.provider.getBalance(memori.address)).to.equal(oldPrice);
 
     await memori.setPrice(newPrice);
-    await memori.payToMint(user.address, 0, hash2, hash2, { "value": newPrice });
+    await memori.payToMint(user.address, 0, hash2, hash2, { 'value': newPrice });
     expect(await memori.price()).to.equal(newPrice);
     expect(await waffle.provider.getBalance(memori.address)).to.equal(oldPrice.add(newPrice));
   });
 
-  it("Test set price by finance role", async function () {
-    const FINANCE_ROLE = await memori.FINANCE_ROLE();
-    const ADMIN_ROLE = await memori.ADMIN_ROLE();
+  it('Test set price by finance role', async function () {
+    const FINANCE_ROLE = await keccak256('FINANCE_ROLE');
+    const ADMIN_ROLE = await keccak256('ADMIN_ROLE');
     const setRoleAdmin = await memori.connect(owner).setRoleAdmin(FINANCE_ROLE, ADMIN_ROLE);
     setRoleAdmin.wait();
 
@@ -52,7 +54,7 @@ describe("Test Price", function () {
     expect(await memori.price()).to.equal(newPrice);
   });
 
-  it("Test reject non-owner trying to set price", async function () {
+  it('Test reject non-owner trying to set price', async function () {
     await expect(memori.connect(user).setPrice(newPrice))
       .to.be.reverted;
   });

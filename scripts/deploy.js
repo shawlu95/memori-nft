@@ -1,6 +1,7 @@
-const { ethers, upgrades } = require("hardhat");
-const hre = require("hardhat");
-const address = require("./address");
+const { ethers, upgrades } = require('hardhat');
+const hre = require('hardhat');
+const { parseEther } = require('ethers/lib/utils');
+const address = require('./address');
 
 async function main() {
   await hre.run('compile');
@@ -9,31 +10,31 @@ async function main() {
   const [owner] = await ethers.getSigners();
 
 
-  const Memo = await ethers.getContractFactory("Memo");
+  const Memo = await ethers.getContractFactory('Memo');
   let memo, memento;
   let tokenAddress = address.getTokenAddress(chainId);
 
-  const tokenSupply = "1000000000000000000000000000";
+  const tokenSupply = parseEther('1000000000');
   if (!tokenAddress) {
-    memo = await Memo.deploy(tokenSupply, { gasLimit: 3056626 });
+    memo = await Memo.deploy(tokenSupply, { gasLimit: 3000000 });
     memo.deployed()
     tokenAddress = memo.address;
-    console.log("Token deployed:", tokenAddress);
+    console.log('Token deployed:', tokenAddress);
   } else {
     memo = await Memo.attach(tokenAddress);
     console.log('tokenAddress:', tokenAddress);
   }
 
-  const price = "10000000000000000000";
-  const reward = "10000000000000000000";
-  const Memento = await ethers.getContractFactory("Memori");
-  let mementosAddress = address.getNftAddress(chainId);
-  if (!mementosAddress) {
-    memento = await upgrades.deployProxy(Memento, [price, reward, memo.address], { gasLimit: 3056626 });
-    console.log("Memento deployed to:", memento.address);
+  const price = parseEther('10');
+  const reward = parseEther('10');
+  const Memori = await ethers.getContractFactory('Memori');
+  let memoriAddress = address.getNftAddress(chainId);
+  if (!memoriAddress) {
+    memento = await upgrades.deployProxy(Memori, [price, reward, memo.address], { gasLimit: 4000000 });
+    console.log('Memori deployed to:', memento.address);
   } else {
-    memento = Memento.attach(mementosAddress);
-    console.log('mementosAddress:', mementosAddress);
+    memento = Memori.attach(memoriAddress);
+    console.log('memoriAddress:', memoriAddress);
   }
 
   // transfer balance to the NFT proxy contract

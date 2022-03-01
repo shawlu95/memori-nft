@@ -1,12 +1,14 @@
-const { expect } = require("chai");
-const { ethers, waffle, upgrades } = require("hardhat");
+const { expect } = require('chai');
+const { ethers, waffle, upgrades } = require('hardhat');
 const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
+const { keccak256 } = require('../scripts/util');
+const { parseEther } = require('ethers/lib/utils');
 
-describe("Test Pause", function () {
+describe('Test Pause', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
-  const price = "10000000000000000000";
+  const price = parseEther('0.1');
   const reward = 0;
 
   let memori;
@@ -21,11 +23,11 @@ describe("Test Pause", function () {
     memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
   });
 
-  it("Test pause by non-admin", async function () {
+  it('Test pause by non-admin', async function () {
     await expect(memori.connect(user).pause()).to.be.reverted;
   });
 
-  it("Test pause & unpause by admin", async function () {
+  it('Test pause & unpause by admin', async function () {
     expect(await memori.paused()).to.equal(false);
     const tx = await memori.connect(owner).pause();
     tx.wait();
@@ -36,8 +38,8 @@ describe("Test Pause", function () {
     expect(await memori.paused()).to.equal(false);
   });
 
-  it("Test pause & unpause by pauser", async function () {
-    const pauserRole = await memori.PAUSER_ROLE();
+  it('Test pause & unpause by pauser', async function () {
+    const pauserRole = await keccak256('PAUSER_ROLE');
 
     expect(await memori.hasRole(pauserRole, pauser.address)).to.equal(false);
     const tx1 = await memori.connect(owner).grantRole(pauserRole, pauser.address);
@@ -54,7 +56,7 @@ describe("Test Pause", function () {
     expect(await memori.paused()).to.equal(false);
   });
 
-  it("Test pause mint, pay to mint, transfer, burn", async function () {
+  it('Test pause mint, pay to mint, transfer, burn', async function () {
     const price = await memori.price();
 
     const pause = await memori.connect(owner).pause();
@@ -67,7 +69,7 @@ describe("Test Pause", function () {
     await expect(memori.burn(0)).to.be.reverted;
   });
 
-  it("Test unpause mint, pay to mint, transfer, burn", async function () {
+  it('Test unpause mint, pay to mint, transfer, burn', async function () {
     const price = await memori.price();
 
     const pause = await memori.connect(owner).pause();

@@ -1,11 +1,12 @@
-const { expect } = require("chai");
-const { ethers, waffle, upgrades } = require("hardhat");
+const { expect } = require('chai');
+const { ethers, waffle, upgrades } = require('hardhat');
 const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
+const { parseEther } = require('ethers/lib/utils');
 
-describe("Test Transaction", function () {
+describe('Test Transaction', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
-  const price = "10000000000000000000";
+  const price = parseEther('0.1');
   const reward = 0;
 
   let memori;
@@ -19,7 +20,7 @@ describe("Test Transaction", function () {
     memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
   });
 
-  it("Test pay to mint and withdraw", async function () {
+  it('Test pay to mint and withdraw', async function () {
     const price = await memori.price();
     expect(await memori.provider.getBalance(memori.address)).to.equal(0);
 

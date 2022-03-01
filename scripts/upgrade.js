@@ -1,15 +1,15 @@
-const { ethers, upgrades } = require("hardhat");
-const hre = require("hardhat");
-const address = require("./address");
+const { ethers, upgrades } = require('hardhat');
+const hre = require('hardhat');
+const address = require('./address');
 
 async function main() {
   await hre.run('compile');
   const chainId = hre.network.config.chainId;
 
   const nftAddress = address.getNftAddress(chainId);
-  const MementoV2 = await ethers.getContractFactory("MementoV2");
-  const mementoV2 = await upgrades.upgradeProxy(nftAddress, MementoV2);
-  console.log("Memento upgraded:", mementoV2.address);
+  const Memori = await ethers.getContractFactory('Memori');
+  const memori = await upgrades.upgradeProxy(nftAddress, Memori);
+  console.log('Memori upgraded:', memori.address);
 }
 
 main().catch((error) => {

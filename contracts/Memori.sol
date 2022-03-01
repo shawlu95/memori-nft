@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC1820RegistryUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
@@ -11,6 +12,7 @@ import "@openzeppelin/contracts/token/ERC777/ERC777.sol";
 
 contract Memori is
     Initializable,
+    OwnableUpgradeable,
     AccessControlUpgradeable,
     ERC721URIStorageUpgradeable,
     PausableUpgradeable
@@ -26,10 +28,10 @@ contract Memori is
     mapping(uint256 => address) private _authors;
     mapping(address => uint256) private _allowance;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
-    bytes32 public constant FINANCE_ROLE = keccak256("FINANCE_ROLE");
+    bytes32 private constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 private constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    bytes32 private constant BURNER_ROLE = keccak256("BURNER_ROLE");
+    bytes32 private constant FINANCE_ROLE = keccak256("FINANCE_ROLE");
     mapping(uint256 => string) private _previewURIs;
     mapping(uint256 => uint256) private _revealAt;
 
@@ -59,6 +61,7 @@ contract Memori is
         __ERC165_init_unchained();
         __ERC721_init_unchained("Memori", "MEMO");
         __Context_init_unchained();
+        __Ownable_init_unchained();
         __AccessControl_init_unchained();
         __ERC721URIStorage_init_unchained();
         __Pausable_init_unchained();

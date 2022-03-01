@@ -1,13 +1,14 @@
-const { expect } = require("chai");
-const { ethers, waffle, upgrades } = require("hardhat");
+const { expect } = require('chai');
+const { ethers, waffle, upgrades } = require('hardhat');
 const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
+const { parseEther } = require('ethers/lib/utils');
 
-describe("Test Burn", function () {
+describe('Test Burn', function () {
   const hash0 = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash1 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
   const IPFS = 'ipfs://';
-  const price = "10000000000000000000";
+  const price = parseEther('0.1');
   const reward = 0;
 
   let memori;
@@ -36,7 +37,7 @@ describe("Test Burn", function () {
     expect(await memori.ownerOf(1)).to.equal(user.address);
   });
 
-  it("Test burn by admin", async function () {
+  it('Test burn by admin', async function () {
     const burn = await memori.connect(owner).burn(0);
     burn.wait();
 
@@ -51,7 +52,7 @@ describe("Test Burn", function () {
     expect(await memori.ownerOf(1)).to.equal(user.address);
   });
 
-  it("Test burn by owner", async function () {
+  it('Test burn by owner', async function () {
     const burn = await memori.connect(user).burn(1);
     burn.wait();
 

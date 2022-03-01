@@ -1,12 +1,13 @@
-const { ethers, upgrades } = require("hardhat");
+const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
+const { parseEther } = require('ethers/lib/utils');
 
 describe('Memo', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const totalSupply = 1000;
-  const price = "10000000000000000000";
+  const price = parseEther('0.1');
   const reward = 10;
   let token, memori;
   let owner, user;
@@ -14,7 +15,7 @@ describe('Memo', function () {
   beforeEach(async function () {
     [owner, user] = await ethers.getSigners();
 
-    const Memo = await ethers.getContractFactory("Memo");
+    const Memo = await ethers.getContractFactory('Memo');
     token = await Memo.deploy(totalSupply);
 
     const Memori = await ethers.getContractFactory(getVersion());

@@ -1,12 +1,14 @@
-const { expect } = require("chai");
-const { ethers, upgrades } = require("hardhat");
+const { expect } = require('chai');
+const { ethers, upgrades } = require('hardhat');
 const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
+const { keccak256 } = require('../scripts/util');
+const { parseEther } = require('ethers/lib/utils');
 
-describe("Test Allowance", function () {
+describe('Test Allowance', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const IPFS = 'ipfs://';
-  const price = "10000000000000000000";
+  const price = parseEther('0.1');
   const reward = 0;
 
   let memori;
@@ -19,7 +21,7 @@ describe("Test Allowance", function () {
     memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
   });
 
-  it("Test set allowance by default admin", async function () {
+  it('Test set allowance by default admin', async function () {
     await memori.connect(owner).setAllowance(owner.address, 5);
     expect(await memori.allowanceOf(owner.address)).to.equal(5);
 
@@ -27,9 +29,9 @@ describe("Test Allowance", function () {
     expect(await memori.allowanceOf(user.address)).to.equal(10);
   });
 
-  it("Test set allowance by finance role", async function () {
-    const FINANCE_ROLE = await memori.FINANCE_ROLE();
-    const ADMIN_ROLE = await memori.ADMIN_ROLE();
+  it('Test set allowance by finance role', async function () {
+    const FINANCE_ROLE = keccak256('FINANCE_ROLE');
+    const ADMIN_ROLE = keccak256('ADMIN_ROLE');
     const setRoleAdmin = await memori.connect(owner).setRoleAdmin(FINANCE_ROLE, ADMIN_ROLE);
     setRoleAdmin.wait();
 
@@ -49,16 +51,16 @@ describe("Test Allowance", function () {
     expect(await memori.allowanceOf(user.address)).to.equal(10);
   });
 
-  it("Test reject non-owner trying to set allowance", async function () {
+  it('Test reject non-owner trying to set allowance', async function () {
     await expect(memori.connect(user).setAllowance(user.address, 5))
       .to.be.reverted;
   });
 
-  it("Test mint with allowance", async function () {
+  it('Test mint with allowance', async function () {
     await memori.setAllowance(user.address, 5);
     expect(await memori.allowanceOf(user.address)).to.equal(5);
 
-    await memori.connect(user).payToMint(user.address, 0, hash, hash, { "value": 0 });
+    await memori.connect(user).payToMint(user.address, 0, hash, hash, { 'value': 0 });
     expect(await memori.allowanceOf(user.address)).to.equal(4);
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + hash);

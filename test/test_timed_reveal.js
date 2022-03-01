@@ -1,13 +1,14 @@
-const { expect } = require("chai");
-const { ethers, waffle, upgrades } = require("hardhat");
+const { expect } = require('chai');
+const { ethers, waffle, upgrades } = require('hardhat');
 const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
+const { parseEther } = require('ethers/lib/utils');
 
-describe("Test timed reveal", function () {
+describe('Test timed reveal', function () {
   const timeURI = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const actualURI = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
   const IPFS = 'ipfs://';
-  const price = "10000000000000000000";
+  const price = parseEther('0.1');
   const reward = 0;
 
   let memori;
@@ -21,7 +22,7 @@ describe("Test timed reveal", function () {
     memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
   });
 
-  it("Test timed reveal", async function () {
+  it('Test timed reveal', async function () {
     const oneHour = 60 * 60;
     const blockNumBefore = await ethers.provider.getBlockNumber();
     const blockBefore = await ethers.provider.getBlock(blockNumBefore);
