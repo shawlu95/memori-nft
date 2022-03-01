@@ -73,9 +73,9 @@ module.exports = {
     },
     polygon: {
       chainId: 137,
-      url: "https://rpc-mainnet.matic.network",
-      from: process.env.ADMIN_PRIVATE_KEY,
-      accounts: [process.env.ADMIN_PRIVATE_KEY]
+      url: "https://polygon-rpc.com/",
+      from: process.env.ADMIN_PRIVATE_KEY_PROD,
+      accounts: [process.env.ADMIN_PRIVATE_KEY_PROD]
     },
     rinkeby: {
       chainId: 4,

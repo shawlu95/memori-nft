@@ -8,26 +8,36 @@ async function main() {
 
   const [owner] = await ethers.getSigners();
 
-  const tokenSupply = "1000000000000000000000000000";
-  const Memo = await ethers.getContractFactory("Memo");
-  const memo = await Memo.deploy("Memo", "MEMO", tokenSupply);
-  memo.deployed()
-  console.log("Token deployed:", memo.address);
-  // in console, grab a handle of the token
-  // const tokenAddress = address.getTokenAddress();
-  // const memo = await Memo.attach(tokenAddress);
 
-  const price = "100000000000000000";
-  const reward = "1000000000000000000";
-  const Memento = await ethers.getContractFactory("MementoV3");
-  const memento = await upgrades.deployProxy(Memento, [price, reward, memo.address]);
-  console.log("Memento deployed to:", memento.address);
-  // in console, grab a handle of the nft
-  // const nftAddress = address.getNftAddress(chainId);
-  // const memento = await Memento.attach(nftAddress);
+  const Memo = await ethers.getContractFactory("Memo");
+  let memo, memento;
+  let tokenAddress = address.getTokenAddress(chainId);
+
+  const tokenSupply = "1000000000000000000000000000";
+  if (!tokenAddress) {
+    memo = await Memo.deploy(tokenSupply, { gasLimit: 3056626 });
+    memo.deployed()
+    tokenAddress = memo.address;
+    console.log("Token deployed:", tokenAddress);
+  } else {
+    memo = await Memo.attach(tokenAddress);
+    console.log('tokenAddress:', tokenAddress);
+  }
+
+  const price = "10000000000000000000";
+  const reward = "10000000000000000000";
+  const Memento = await ethers.getContractFactory("Memori");
+  let mementosAddress = address.getNftAddress(chainId);
+  if (!mementosAddress) {
+    memento = await upgrades.deployProxy(Memento, [price, reward, memo.address], { gasLimit: 3056626 });
+    console.log("Memento deployed to:", memento.address);
+  } else {
+    memento = Memento.attach(mementosAddress);
+    console.log('mementosAddress:', mementosAddress);
+  }
 
   // transfer balance to the NFT proxy contract
-  await memo.connect(owner).send(memento.address, tokenSupply, []);
+  await memo.connect(owner).send(memento.address, tokenSupply, [], { gasLimit: 210000 });
 }
 
 main().catch((error) => {

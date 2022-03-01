@@ -15,7 +15,7 @@ describe('Memo', function () {
     [owner, user] = await ethers.getSigners();
 
     const Memo = await ethers.getContractFactory("Memo");
-    token = await Memo.deploy("Memo", "MEMO", totalSupply);
+    token = await Memo.deploy(totalSupply);
 
     const Memento = await ethers.getContractFactory(getVersion());
     memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
