@@ -10,15 +10,15 @@ describe("Test timed reveal", function () {
   const price = "10000000000000000000";
   const reward = 0;
 
-  let memento;
+  let memori;
   let owner;
   let user;
 
   beforeEach(async function () {
     [owner, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory(getVersion());
-    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
+    const Memori = await ethers.getContractFactory(getVersion());
+    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Test timed reveal", async function () {
@@ -28,24 +28,24 @@ describe("Test timed reveal", function () {
     const timestampBefore = blockBefore.timestamp;
     const revealAt = timestampBefore + oneHour; // e.g. 1644133774
 
-    expect(await memento.supply()).to.equal(0);
+    expect(await memori.supply()).to.equal(0);
 
-    await memento.mint(owner.address, owner.address, revealAt, timeURI, actualURI);
-    expect(await memento.supply()).to.equal(1);
-    expect(await memento.tokenURI(0)).to.equal(IPFS + timeURI);
-    expect(await memento.authorOf(0)).to.equal(owner.address);
-    expect(await memento.ownerOf(0)).to.equal(owner.address);
-    expect(await memento.revealAt(0)).to.equal(revealAt);
+    await memori.mint(owner.address, owner.address, revealAt, timeURI, actualURI);
+    expect(await memori.supply()).to.equal(1);
+    expect(await memori.tokenURI(0)).to.equal(IPFS + timeURI);
+    expect(await memori.authorOf(0)).to.equal(owner.address);
+    expect(await memori.ownerOf(0)).to.equal(owner.address);
+    expect(await memori.revealAt(0)).to.equal(revealAt);
 
     await ethers.provider.send('evm_increaseTime', [oneHour]);
     await ethers.provider.send('evm_mine');
 
-    expect(await memento.tokenURI(0)).to.equal(IPFS + actualURI);
+    expect(await memori.tokenURI(0)).to.equal(IPFS + actualURI);
   });
 
   after(async function () {
-    const balance = await waffle.provider.getBalance(memento.address);
-    const tx = await memento.withdrawEther(balance);
+    const balance = await waffle.provider.getBalance(memori.address);
+    const tx = await memori.withdrawEther(balance);
     tx.wait();
   });
 });

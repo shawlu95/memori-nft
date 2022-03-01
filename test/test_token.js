@@ -8,7 +8,7 @@ describe('Memo', function () {
   const totalSupply = 1000;
   const price = "10000000000000000000";
   const reward = 10;
-  let token, memento;
+  let token, memori;
   let owner, user;
 
   beforeEach(async function () {
@@ -17,8 +17,8 @@ describe('Memo', function () {
     const Memo = await ethers.getContractFactory("Memo");
     token = await Memo.deploy(totalSupply);
 
-    const Memento = await ethers.getContractFactory(getVersion());
-    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
+    const Memori = await ethers.getContractFactory(getVersion());
+    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it('Test name', async function () {
@@ -35,30 +35,30 @@ describe('Memo', function () {
   });
 
   it('Test deposit token to 721 address', async function () {
-    await expect(token.connect(owner).send(memento.address, 10, [])).to.be.reverted;
-    await memento.setToken(token.address);
+    await expect(token.connect(owner).send(memori.address, 10, [])).to.be.reverted;
+    await memori.setToken(token.address);
     const deposit = 100;
 
-    const tx = await token.connect(owner).send(memento.address, deposit, []);
+    const tx = await token.connect(owner).send(memori.address, deposit, []);
     tx.wait();
 
     expect(await token.balanceOf(owner.address)).to.equal(totalSupply - deposit);
-    expect(await token.balanceOf(memento.address)).to.equal(deposit);
+    expect(await token.balanceOf(memori.address)).to.equal(deposit);
   });
 
   it('Test reward minter', async function () {
-    await memento.setToken(token.address);
-    const price = await memento.price();
+    await memori.setToken(token.address);
+    const price = await memori.price();
     const deposit = 100;
 
-    const tx = await token.connect(owner).send(memento.address, deposit, []);
+    const tx = await token.connect(owner).send(memori.address, deposit, []);
     tx.wait();
 
-    expect(await token.balanceOf(memento.address)).to.equal(deposit);
+    expect(await token.balanceOf(memori.address)).to.equal(deposit);
 
-    await memento.connect(user).payToMint(user.address, 0, hash, hash, { value: price });
+    await memori.connect(user).payToMint(user.address, 0, hash, hash, { value: price });
 
-    expect(await token.balanceOf(memento.address)).to.equal(deposit - 10);
+    expect(await token.balanceOf(memori.address)).to.equal(deposit - 10);
     expect(await token.balanceOf(user.address)).to.equal(10);
   });
 

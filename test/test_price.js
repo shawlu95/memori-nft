@@ -12,54 +12,54 @@ describe("Test Price", function () {
 
   let oldPrice;
 
-  let memento;
+  let memori;
   let owner, admin, finance, user;
 
   beforeEach(async function () {
     [owner, admin, finance, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory(getVersion());
-    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
-    oldPrice = await memento.price();
+    const Memori = await ethers.getContractFactory(getVersion());
+    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
+    oldPrice = await memori.price();
   });
 
   it("Test set price by default admin", async function () {
-    await memento.payToMint(user.address, 0, hash, hash, { "value": oldPrice });
-    expect(await waffle.provider.getBalance(memento.address)).to.equal(oldPrice);
+    await memori.payToMint(user.address, 0, hash, hash, { "value": oldPrice });
+    expect(await waffle.provider.getBalance(memori.address)).to.equal(oldPrice);
 
-    await memento.setPrice(newPrice);
-    await memento.payToMint(user.address, 0, hash2, hash2, { "value": newPrice });
-    expect(await memento.price()).to.equal(newPrice);
-    expect(await waffle.provider.getBalance(memento.address)).to.equal(oldPrice.add(newPrice));
+    await memori.setPrice(newPrice);
+    await memori.payToMint(user.address, 0, hash2, hash2, { "value": newPrice });
+    expect(await memori.price()).to.equal(newPrice);
+    expect(await waffle.provider.getBalance(memori.address)).to.equal(oldPrice.add(newPrice));
   });
 
   it("Test set price by finance role", async function () {
-    const FINANCE_ROLE = await memento.FINANCE_ROLE();
-    const ADMIN_ROLE = await memento.ADMIN_ROLE();
-    const setRoleAdmin = await memento.connect(owner).setRoleAdmin(FINANCE_ROLE, ADMIN_ROLE);
+    const FINANCE_ROLE = await memori.FINANCE_ROLE();
+    const ADMIN_ROLE = await memori.ADMIN_ROLE();
+    const setRoleAdmin = await memori.connect(owner).setRoleAdmin(FINANCE_ROLE, ADMIN_ROLE);
     setRoleAdmin.wait();
 
-    const grantAdminRole = await memento.connect(owner).grantRole(ADMIN_ROLE, admin.address);
+    const grantAdminRole = await memori.connect(owner).grantRole(ADMIN_ROLE, admin.address);
     grantAdminRole.wait();
 
-    const grantFinanceRole = await memento.connect(admin).grantRole(FINANCE_ROLE, finance.address);
+    const grantFinanceRole = await memori.connect(admin).grantRole(FINANCE_ROLE, finance.address);
     grantFinanceRole.wait();
 
-    await expect(memento.connect(admin).setPrice(newPrice)).to.be.reverted;
-    expect(await memento.price()).to.equal(oldPrice);
+    await expect(memori.connect(admin).setPrice(newPrice)).to.be.reverted;
+    expect(await memori.price()).to.equal(oldPrice);
 
-    await memento.connect(finance).setPrice(newPrice);
-    expect(await memento.price()).to.equal(newPrice);
+    await memori.connect(finance).setPrice(newPrice);
+    expect(await memori.price()).to.equal(newPrice);
   });
 
   it("Test reject non-owner trying to set price", async function () {
-    await expect(memento.connect(user).setPrice(newPrice))
+    await expect(memori.connect(user).setPrice(newPrice))
       .to.be.reverted;
   });
 
   after(async function () {
-    const balance = await waffle.provider.getBalance(memento.address);
-    const tx = await memento.withdrawEther(balance);
+    const balance = await waffle.provider.getBalance(memori.address);
+    const tx = await memori.withdrawEther(balance);
     tx.wait();
   });
 });

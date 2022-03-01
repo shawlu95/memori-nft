@@ -10,39 +10,39 @@ describe("Test proxy", function () {
   const price = "10000000000000000000";
   const reward = 0;
 
-  let memento;
+  let memori;
   let owner;
   let user;
 
   beforeEach(async function () {
     [owner, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory("MementoV2");
-    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
+    const Memori = await ethers.getContractFactory("Memori");
+    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Test upgrade proxy", async function () {
-    expect(await memento.supply()).to.equal(0);
+    expect(await memori.supply()).to.equal(0);
 
-    await memento.mint(owner.address, owner.address, 0, hash, hash);
-    expect(await memento.supply()).to.equal(1);
-    expect(await memento.tokenURI(0)).to.equal(IPFS + hash);
-    expect(await memento.authorOf(0)).to.equal(owner.address);
-    expect(await memento.ownerOf(0)).to.equal(owner.address);
+    await memori.mint(owner.address, owner.address, 0, hash, hash);
+    expect(await memori.supply()).to.equal(1);
+    expect(await memori.tokenURI(0)).to.equal(IPFS + hash);
+    expect(await memori.authorOf(0)).to.equal(owner.address);
+    expect(await memori.ownerOf(0)).to.equal(owner.address);
 
-    const MementoNew = await ethers.getContractFactory(getVersion());
-    const mementoNew = await upgrades.upgradeProxy(memento.address, MementoNew);
+    const MemoriNew = await ethers.getContractFactory(getVersion());
+    const memoriNew = await upgrades.upgradeProxy(memori.address, MemoriNew);
 
-    expect(await mementoNew.supply()).to.equal(1);
-    expect(await mementoNew.tokenURI(0)).to.equal(IPFS + hash);
-    expect(await mementoNew.authorOf(0)).to.equal(owner.address);
-    expect(await mementoNew.ownerOf(0)).to.equal(owner.address);
-    expect(await mementoNew.name()).to.equal("Memento Script Beta 2.2");
+    expect(await memoriNew.supply()).to.equal(1);
+    expect(await memoriNew.tokenURI(0)).to.equal(IPFS + hash);
+    expect(await memoriNew.authorOf(0)).to.equal(owner.address);
+    expect(await memoriNew.ownerOf(0)).to.equal(owner.address);
+    expect(await memoriNew.name()).to.equal("Memori");
   });
 
   after(async function () {
-    const balance = await waffle.provider.getBalance(memento.address);
-    const tx = await memento.withdrawEther(balance);
+    const balance = await waffle.provider.getBalance(memori.address);
+    const tx = await memori.withdrawEther(balance);
     tx.wait();
   });
 });

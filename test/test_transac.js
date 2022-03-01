@@ -8,32 +8,32 @@ describe("Test Transaction", function () {
   const price = "10000000000000000000";
   const reward = 0;
 
-  let memento;
+  let memori;
   let owner;
   let user;
 
   beforeEach(async function () {
     [owner, user] = await ethers.getSigners();
 
-    const Memento = await ethers.getContractFactory(getVersion());
-    memento = await upgrades.deployProxy(Memento, [price, reward, constants.ZERO_ADDRESS]);
+    const Memori = await ethers.getContractFactory(getVersion());
+    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
   });
 
   it("Test pay to mint and withdraw", async function () {
-    const price = await memento.price();
-    expect(await memento.provider.getBalance(memento.address)).to.equal(0);
+    const price = await memori.price();
+    expect(await memori.provider.getBalance(memori.address)).to.equal(0);
 
-    await memento.connect(user).payToMint(user.address, 0, hash, hash, { value: price });
-    expect(await memento.supply()).to.equal(1);
-    expect(await waffle.provider.getBalance(memento.address)).to.equal(price);
+    await memori.connect(user).payToMint(user.address, 0, hash, hash, { value: price });
+    expect(await memori.supply()).to.equal(1);
+    expect(await waffle.provider.getBalance(memori.address)).to.equal(price);
 
-    await memento.connect(owner).withdrawEther(price);
-    expect(await waffle.provider.getBalance(memento.address)).to.equal(0);
+    await memori.connect(owner).withdrawEther(price);
+    expect(await waffle.provider.getBalance(memori.address)).to.equal(0);
   });
 
   after(async function () {
-    const balance = await waffle.provider.getBalance(memento.address);
-    const tx = await memento.withdrawEther(balance);
+    const balance = await waffle.provider.getBalance(memori.address);
+    const tx = await memori.withdrawEther(balance);
     tx.wait();
   });
 });
