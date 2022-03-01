@@ -8,7 +8,7 @@ async function main() {
 
   const nftAddress = address.getNftAddress(chainId);
   const Memori = await ethers.getContractFactory('Memori');
-  const memori = await upgrades.upgradeProxy(nftAddress, Memori);
+  const memori = await upgrades.upgradeProxy(nftAddress, Memori, { gasLimit: 5000000 });
   console.log('Memori upgraded:', memori.address);
 }
 

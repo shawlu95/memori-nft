@@ -285,7 +285,14 @@ contract Memori is
     }
 
     function version() public pure returns (string memory) {
-        return "1.0.0";
+        return "1.0.1";
+    }
+
+    function setTokenURI(uint256 _tokenId, string memory _tokenURI)
+        public
+        onlyRole(ADMIN_ROLE)
+    {
+        super._setTokenURI(_tokenId, makeURI(_tokenURI));
     }
 
     // uint256[48] private __gap;
