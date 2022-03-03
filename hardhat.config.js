@@ -62,8 +62,8 @@ module.exports = {
   },
   networks: {
     ganache: {
-      url: "HTTP://127.0.0.1:7545",
-      network_id: "5777"
+      chainId: 1337,
+      url: "HTTP://127.0.0.1:8545"
     },
     polygonMumbai: {
       chainId: 80001,
