@@ -17,7 +17,7 @@ describe('Test Role', function () {
     [owner, admin, minter, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
+    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
 
     ADMIN_ROLE = keccak256('ADMIN_ROLE');
     MINTER_ROLE = keccak256('MINTER_ROLE');
@@ -29,7 +29,6 @@ describe('Test Role', function () {
   it('Test default admin has all roles', async function () {
     expect(await memori.hasRole(ADMIN_ROLE, owner.address)).to.equal(true);
     expect(await memori.hasRole(MINTER_ROLE, owner.address)).to.equal(true);
-    expect(await memori.hasRole(PAUSER_ROLE, owner.address)).to.equal(true);
     expect(await memori.hasRole(BURNER_ROLE, owner.address)).to.equal(true);
     expect(await memori.hasRole(FINANCE_ROLE, owner.address)).to.equal(true);
   });

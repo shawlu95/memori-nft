@@ -30,7 +30,7 @@ async function main() {
   const Memori = await ethers.getContractFactory('Memori');
   let memoriAddress = address.getNftAddress(chainId);
   if (!memoriAddress) {
-    memento = await upgrades.deployProxy(Memori, [price, reward, memo.address], { gasLimit: 4000000 });
+    memento = await Memori.deploy(price, reward, memo.address, { gasLimit: 4000000 });
     console.log('Memori deployed to:', memento.address);
   } else {
     memento = Memori.attach(memoriAddress);

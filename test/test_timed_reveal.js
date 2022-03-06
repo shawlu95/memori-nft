@@ -19,7 +19,7 @@ describe('Test timed reveal', function () {
     [owner, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
+    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
   });
 
   it('Test timed reveal', async function () {

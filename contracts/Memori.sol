@@ -2,23 +2,14 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC1820RegistryUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC1820Registry.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC777/ERC777.sol";
 
-contract Memori is
-    Initializable,
-    OwnableUpgradeable,
-    AccessControlUpgradeable,
-    ERC721URIStorageUpgradeable,
-    PausableUpgradeable
-{
+contract Memori is AccessControl, ERC721URIStorage {
     using Counters for Counters.Counter;
-    IERC1820RegistryUpgradeable private _erc1820;
+    IERC1820Registry private _erc1820;
     ERC777 private _token;
     Counters.Counter private _minted;
     Counters.Counter private _burned;
@@ -29,7 +20,6 @@ contract Memori is
     mapping(address => uint256) private _allowance;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 private constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 private constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 private constant BURNER_ROLE = keccak256("BURNER_ROLE");
     bytes32 private constant FINANCE_ROLE = keccak256("FINANCE_ROLE");
     mapping(uint256 => string) private _previewURIs;
@@ -53,30 +43,19 @@ contract Memori is
         bytes operatorData
     );
 
-    function initialize(
+    constructor(
         uint256 _price,
         uint256 _reward,
         address token
-    ) public initializer {
-        __ERC165_init_unchained();
-        __ERC721_init_unchained("Memori", "MEMO");
-        __Context_init_unchained();
-        __Ownable_init_unchained();
-        __AccessControl_init_unchained();
-        __ERC721URIStorage_init_unchained();
-        __Pausable_init_unchained();
-
+    ) ERC721("memo-ri", "MEMO") {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setupRole(ADMIN_ROLE, _msgSender());
         _setupRole(MINTER_ROLE, _msgSender());
-        _setupRole(PAUSER_ROLE, _msgSender());
         _setupRole(BURNER_ROLE, _msgSender());
         _setupRole(FINANCE_ROLE, _msgSender());
 
         _token = ERC777(token);
-        _erc1820 = IERC1820RegistryUpgradeable(
-            0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
-        );
+        _erc1820 = IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
         _erc1820.setInterfaceImplementer(
             address(this),
             keccak256("ERC777TokensRecipient"),
@@ -92,7 +71,7 @@ contract Memori is
     }
 
     function authorOf(uint256 tokenId) public view virtual returns (address) {
-        require(_exists(tokenId), "ERC721: nonexistent token");
+        require(_exists(tokenId));
         return _authors[tokenId];
     }
 
@@ -118,11 +97,6 @@ contract Memori is
         }
     }
 
-    function isMinted(string memory _tokenURI) public view returns (bool) {
-        bytes32 byteURI = getByte32(_tokenURI);
-        return _ipfsHash[byteURI];
-    }
-
     function mint(
         address _recipient,
         address _author,
@@ -130,7 +104,6 @@ contract Memori is
         string memory _previewURI,
         string memory _tokenURI
     ) public onlyRole(MINTER_ROLE) {
-        require(!paused(), "Mint while paused!");
         _execMint(_recipient, _author, _reveal, _previewURI, _tokenURI);
     }
 
@@ -140,11 +113,10 @@ contract Memori is
         string memory _previewURI,
         string memory _tokenURI
     ) public payable {
-        require(!paused(), "Pay to mint while paused!");
         if (_allowance[_msgSender()] > 0) {
             _allowance[_msgSender()] -= 1;
         } else {
-            require(msg.value >= price, "Insufficient fund!");
+            require(msg.value >= price);
         }
         _execMint(_recipient, _msgSender(), _reveal, _previewURI, _tokenURI);
         if (reward > 0) {
@@ -160,7 +132,7 @@ contract Memori is
         string memory _tokenURI
     ) internal {
         bytes32 byteURI = getByte32(_tokenURI);
-        require(_ipfsHash[byteURI] == false, "Already minted!");
+        require(_ipfsHash[byteURI] == false);
         uint256 id = _minted.current();
         _safeMint(_recipient, id);
         _setTokenURI(id, makeURI(_tokenURI));
@@ -190,21 +162,17 @@ contract Memori is
         address to,
         uint256 amount
     ) internal virtual override {
-        require(!paused(), "Transfer while paused!");
         super._beforeTokenTransfer(from, to, amount);
     }
 
     function withdrawEther(uint256 amount) public onlyRole(FINANCE_ROLE) {
-        require(amount <= address(this).balance, "Insufficient fund!");
+        require(amount <= address(this).balance);
         payable(_msgSender()).transfer(amount);
         emit WithdrawEther(_msgSender(), amount);
     }
 
     function withdrawToken(uint256 amount) public onlyRole(FINANCE_ROLE) {
-        require(
-            amount <= _token.balanceOf(address(this)),
-            "Insufficient fund!"
-        );
+        require(amount <= _token.balanceOf(address(this)));
         _token.send(_msgSender(), amount, "");
         emit WithdrawToken(_msgSender(), amount);
     }
@@ -214,10 +182,6 @@ contract Memori is
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _setRoleAdmin(role, adminRole);
-    }
-
-    function setToken(address token) public onlyRole(FINANCE_ROLE) {
-        _token = ERC777(token);
     }
 
     function setPrice(uint256 _price) public onlyRole(FINANCE_ROLE) {
@@ -238,35 +202,21 @@ contract Memori is
         emit SetAllowance(_msgSender(), _user, _allowed);
     }
 
-    function pause() public onlyRole(PAUSER_ROLE) {
-        _pause();
-    }
-
-    function unpause() public onlyRole(PAUSER_ROLE) {
-        _unpause();
-    }
-
     function burn(uint256 tokenId) public {
-        require(!paused(), "Burn while paused!");
         require(
             hasRole(BURNER_ROLE, _msgSender()) ||
-                ownerOf(tokenId) == _msgSender(),
-            "Not burner or owner!"
+                ownerOf(tokenId) == _msgSender()
         );
         _burn(tokenId);
         delete _authors[tokenId];
         _burned.increment();
     }
 
-    function contractURI() public pure returns (string memory) {
-        return "https://www.mementos-nft.com/meta";
-    }
-
     function supportsInterface(bytes4 interfaceId)
         public
         view
         virtual
-        override(AccessControlUpgradeable, ERC721Upgradeable)
+        override(AccessControl, ERC721)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
@@ -280,20 +230,7 @@ contract Memori is
         bytes calldata userData,
         bytes calldata operatorData
     ) external {
-        require(msg.sender == address(_token), "Invalid token!");
+        require(msg.sender == address(_token));
         emit ReceivedToken(operator, from, to, amount, userData, operatorData);
     }
-
-    function version() public pure returns (string memory) {
-        return "1.0.1";
-    }
-
-    function setTokenURI(uint256 _tokenId, string memory _tokenURI)
-        public
-        onlyRole(ADMIN_ROLE)
-    {
-        super._setTokenURI(_tokenId, makeURI(_tokenURI));
-    }
-
-    // uint256[48] private __gap;
 }

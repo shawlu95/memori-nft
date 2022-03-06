@@ -96,6 +96,7 @@ module.exports = {
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
+    gasPriceApi: process.env.gasPriceApi,
     currency: "USD",
   },
   contractSizer: {

@@ -4,7 +4,7 @@ const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
 const { parseEther } = require('ethers/lib/utils');
 
-describe('Test proxy', function () {
+describe.skip('Test proxy', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
   const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
   const IPFS = 'ipfs://';
@@ -19,7 +19,7 @@ describe('Test proxy', function () {
     [owner, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory('Memori');
-    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
+    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
   });
 
   it('Test upgrade proxy', async function () {

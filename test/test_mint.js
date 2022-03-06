@@ -19,7 +19,7 @@ describe('Test Mint', function () {
   beforeEach(async function () {
     [owner, minter, user] = await ethers.getSigners();
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
+    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
   });
 
   it('Test mint by owner', async function () {
@@ -59,7 +59,7 @@ describe('Test Mint', function () {
     expect(await memori.ownerOf(0)).to.equal(owner.address);
 
     await expect(memori.mint(owner.address, owner.address, 0, hash, hash))
-      .to.be.revertedWith('Already minted!');
+      .to.be.reverted;
     expect(await memori.supply()).to.equal(1);
   });
 
@@ -84,7 +84,7 @@ describe('Test Mint', function () {
   it('Test mint fail insufficient fund', async function () {
     const price = await memori.price();
     await expect(memori.connect(user).payToMint(user.address, 0, hash, hash, { value: price.sub(1) }))
-      .to.be.revertedWith('Insufficient fund!');
+      .to.be.reverted;
   });
 
   after(async function () {

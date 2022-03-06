@@ -21,7 +21,7 @@ describe('Test Price', function () {
     [owner, admin, finance, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
+    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
     oldPrice = await memori.price();
   });
 

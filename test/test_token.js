@@ -19,7 +19,7 @@ describe('Memo', function () {
     token = await Memo.deploy(totalSupply);
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
+    memori = await Memori.deploy(price, reward, token.address);
   });
 
   it('Test name', async function () {
@@ -36,8 +36,6 @@ describe('Memo', function () {
   });
 
   it('Test deposit token to 721 address', async function () {
-    await expect(token.connect(owner).send(memori.address, 10, [])).to.be.reverted;
-    await memori.setToken(token.address);
     const deposit = 100;
 
     const tx = await token.connect(owner).send(memori.address, deposit, []);
@@ -48,7 +46,6 @@ describe('Memo', function () {
   });
 
   it('Test reward minter', async function () {
-    await memori.setToken(token.address);
     const price = await memori.price();
     const deposit = 100;
 

@@ -4,7 +4,7 @@ const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
 const { parseEther } = require('ethers/lib/utils');
 
-describe('Test Ownable', function () {
+describe.skip('Test Ownable', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
 
   const price = parseEther('0.1');
@@ -18,7 +18,7 @@ describe('Test Ownable', function () {
     [owner, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await upgrades.deployProxy(Memori, [price, reward, constants.ZERO_ADDRESS]);
+    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
   });
 
   it('Test owner', async function () {
