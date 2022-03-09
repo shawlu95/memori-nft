@@ -47,7 +47,7 @@ contract Memori is AccessControl, ERC721URIStorage {
         uint256 _price,
         uint256 _reward,
         address token
-    ) ERC721("memo-ri", "MEMO") {
+    ) ERC721("Memo-ri", "MEMO") {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setupRole(ADMIN_ROLE, _msgSender());
         _setupRole(MINTER_ROLE, _msgSender());

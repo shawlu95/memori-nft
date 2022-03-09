@@ -95,9 +95,9 @@ module.exports = {
     }
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    gasPriceApi: process.env.gasPriceApi,
-    currency: "USD",
+    enabled: true,
+    coinmarketcap: process.env.COIN_MARKET_CAP_API_KEY,
+    currency: "USD"
   },
   contractSizer: {
     except: ['contracts/Memento.sol', 'contracts/Memo.sol']
