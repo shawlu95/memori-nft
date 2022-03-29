@@ -19,7 +19,7 @@ describe('Test Mint', function () {
   beforeEach(async function () {
     [owner, minter, user] = await ethers.getSigners();
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
+    memori = await Memori.deploy(price);
   });
 
   it('Test mint by owner', async function () {
@@ -38,7 +38,7 @@ describe('Test Mint', function () {
     expect(await memori.ownerOf(1)).to.equal(owner.address);
   });
 
-  it('Test mint by minter', async function () {
+  it.skip('Test mint by minter', async function () {
     const minterRole = keccak256('MINTER_ROLE');
     expect(await memori.hasRole(minterRole, minter.address)).to.equal(false);
     const grantRole = await memori.connect(owner).grantRole(minterRole, minter.address);

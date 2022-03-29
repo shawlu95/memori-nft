@@ -19,7 +19,7 @@ describe.skip('Test proxy', function () {
     [owner, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory('Memori');
-    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
+    memori = await Memori.deploy(price);
   });
 
   it('Test upgrade proxy', async function () {

@@ -20,7 +20,7 @@ describe.skip('Test Pause', function () {
     [owner, pauser, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
+    memori = await Memori.deploy(price);
   });
 
   it('Test pause by non-admin', async function () {

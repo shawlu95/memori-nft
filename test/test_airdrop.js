@@ -19,7 +19,7 @@ describe('Test Airdrop', function () {
     [owner, user1, user2] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
+    memori = await Memori.deploy(price);
   });
 
   it('Mint by owner, assign to another user', async function () {

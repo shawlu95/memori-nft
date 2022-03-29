@@ -5,7 +5,7 @@ const { getVersion } = require('../scripts/address');
 const { keccak256 } = require('../scripts/util');
 const { parseEther } = require('ethers/lib/utils');
 
-describe('Test Role', function () {
+describe.skip('Test Role', function () {
   const price = parseEther('0.1');
   const reward = 0;
 
