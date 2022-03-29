@@ -16,22 +16,9 @@ contract Memori is Ownable, ERC721URIStorage {
     mapping(uint256 => string) private _previewURIs;
     mapping(uint256 => uint256) private _revealAt;
 
-    event SetAllowance(
-        address indexed by,
-        address indexed recipient,
-        uint256 allowance
-    );
-    event SetPrice(address indexed by, uint256 price);
-    event WithdrawEther(address indexed by, uint256 amount);
-    event WithdrawToken(address indexed by, uint256 amount);
-    event ReceivedToken(
-        address operator,
-        address from,
-        address to,
-        uint256 amount,
-        bytes userData,
-        bytes operatorData
-    );
+    event SetAllowance(address recipient, uint256 allowance);
+    event SetPrice(uint256 price);
+    event WithdrawEther(uint256 amount);
 
     constructor(uint256 _price) ERC721("Memo-ri", "MEMO") {
         price = _price;
@@ -105,11 +92,9 @@ contract Memori is Ownable, ERC721URIStorage {
         override
         returns (string memory)
     {
-        if (_revealAt[tokenId] <= block.timestamp) {
+        if (_revealAt[tokenId] <= block.timestamp)
             return super.tokenURI(tokenId);
-        } else {
-            return _previewURIs[tokenId];
-        }
+        return _previewURIs[tokenId];
     }
 
     function _beforeTokenTransfer(
@@ -123,17 +108,17 @@ contract Memori is Ownable, ERC721URIStorage {
     function withdrawEther(uint256 amount) public onlyOwner {
         require(amount <= address(this).balance);
         payable(_msgSender()).transfer(amount);
-        emit WithdrawEther(_msgSender(), amount);
+        emit WithdrawEther(amount);
     }
 
     function setPrice(uint256 _price) public onlyOwner {
         price = _price;
-        emit SetPrice(_msgSender(), _price);
+        emit SetPrice(_price);
     }
 
     function setAllowance(address _user, uint256 _allowed) public onlyOwner {
         _allowance[_user] = _allowed;
-        emit SetAllowance(_msgSender(), _user, _allowed);
+        emit SetAllowance(_user, _allowed);
     }
 
     function burn(uint256 tokenId) public {
