@@ -20,6 +20,7 @@ describe('Test timed reveal', function () {
 
     const Memori = await ethers.getContractFactory(getVersion());
     memori = await Memori.deploy(price);
+    await memori.setAllowance(owner.address, 10);
   });
 
   it('Test timed reveal', async function () {
@@ -31,7 +32,7 @@ describe('Test timed reveal', function () {
 
     expect(await memori.supply()).to.equal(0);
 
-    await memori.mint(owner.address, owner.address, revealAt, timeURI, actualURI);
+    await memori.mint(owner.address, revealAt, timeURI, actualURI);
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + timeURI);
     expect(await memori.authorOf(0)).to.equal(owner.address);

@@ -20,11 +20,12 @@ describe('Test Burn', function () {
 
     const Memori = await ethers.getContractFactory(getVersion());
     memori = await Memori.deploy(price);
+    await memori.setAllowance(owner.address, 10);
 
-    const mint0 = await memori.mint(owner.address, owner.address, 0, hash0, hash0);
+    const mint0 = await memori.mint(owner.address, 0, hash0, hash0);
     mint0.wait();
 
-    const mint1 = await memori.mint(user.address, owner.address, 0, hash1, hash1);
+    const mint1 = await memori.mint(user.address, 0, hash1, hash1);
     mint1.wait();
 
     expect(await memori.supply()).to.equal(2);

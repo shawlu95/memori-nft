@@ -20,12 +20,13 @@ describe('Test Airdrop', function () {
 
     const Memori = await ethers.getContractFactory(getVersion());
     memori = await Memori.deploy(price);
+    await memori.setAllowance(owner.address, 10);
   });
 
   it('Mint by owner, assign to another user', async function () {
     expect(await memori.supply()).to.equal(0);
 
-    await memori.mint(user1.address, owner.address, 0, hash, hash);
+    await memori.mint(user1.address, 0, hash, hash);
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memori.authorOf(0)).to.equal(owner.address);
@@ -36,7 +37,7 @@ describe('Test Airdrop', function () {
     const price = await memori.price();
     expect(await memori.supply()).to.equal(0);
 
-    await memori.connect(user1).payToMint(user2.address, 0, hash, hash, { 'value': price });
+    await memori.connect(user1).mint(user2.address, 0, hash, hash, { 'value': price });
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memori.authorOf(0)).to.equal(user1.address);

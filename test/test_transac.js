@@ -18,13 +18,14 @@ describe('Test Transaction', function () {
 
     const Memori = await ethers.getContractFactory(getVersion());
     memori = await Memori.deploy(price);
+    await memori.setAllowance(owner.address, 10);
   });
 
   it('Test pay to mint and withdraw', async function () {
     const price = await memori.price();
     expect(await memori.provider.getBalance(memori.address)).to.equal(0);
 
-    await memori.connect(user).payToMint(user.address, 0, hash, hash, { value: price });
+    await memori.connect(user).mint(user.address, 0, hash, hash, { value: price });
     expect(await memori.supply()).to.equal(1);
     expect(await waffle.provider.getBalance(memori.address)).to.equal(price);
 

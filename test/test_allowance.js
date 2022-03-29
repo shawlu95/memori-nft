@@ -19,6 +19,7 @@ describe('Test Allowance', function () {
 
     const Memori = await ethers.getContractFactory(getVersion());
     memori = await Memori.deploy(price);
+    await memori.setAllowance(owner.address, 10);
   });
 
   it('Test set allowance by default admin', async function () {
@@ -60,7 +61,7 @@ describe('Test Allowance', function () {
     await memori.setAllowance(user.address, 5);
     expect(await memori.allowanceOf(user.address)).to.equal(5);
 
-    await memori.connect(user).payToMint(user.address, 0, hash, hash, { 'value': 0 });
+    await memori.connect(user).mint(user.address, 0, hash, hash, { 'value': 0 });
     expect(await memori.allowanceOf(user.address)).to.equal(4);
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + hash);

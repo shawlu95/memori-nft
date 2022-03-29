@@ -21,6 +21,7 @@ describe.skip('Test Pause', function () {
 
     const Memori = await ethers.getContractFactory(getVersion());
     memori = await Memori.deploy(price);
+    await memori.setAllowance(owner.address, 10);
   });
 
   it('Test pause by non-admin', async function () {
@@ -56,20 +57,19 @@ describe.skip('Test Pause', function () {
     expect(await memori.paused()).to.equal(false);
   });
 
-  it('Test pause mint, pay to mint, transfer, burn', async function () {
+  it('Test pause mint, transfer, burn', async function () {
     const price = await memori.price();
 
     const pause = await memori.connect(owner).pause();
     pause.wait();
     expect(await memori.paused()).to.equal(true);
 
-    await expect(memori.connect(owner).mint(owner.address, owner.address, 0, hash, hash)).to.be.reverted;
-    await expect(memori.connect(user).payToMint(user.address, 0, hash2, hash2, { value: price })).to.be.reverted;
+    await expect(memori.connect(owner).mint(owner.address, 0, hash, hash)).to.be.reverted;
     await expect(memori.connect(user).transferFrom(user.address, owner.address, 0)).to.be.reverted;
     await expect(memori.burn(0)).to.be.reverted;
   });
 
-  it('Test unpause mint, pay to mint, transfer, burn', async function () {
+  it('Test unpause mint, transfer, burn', async function () {
     const price = await memori.price();
 
     const pause = await memori.connect(owner).pause();
@@ -80,13 +80,9 @@ describe.skip('Test Pause', function () {
     unpause.wait();
     expect(await memori.paused()).to.equal(false);
 
-    const mint = await memori.connect(owner).mint(owner.address, owner.address, 0, hash, hash);
+    const mint = await memori.connect(owner).mint(owner.address, 0, hash, hash);
     mint.wait();
     expect(await memori.ownerOf(0)).to.equal(owner.address);
-
-    const payToMint = await memori.connect(user).payToMint(user.address, 0, hash2, hash2, { value: price });
-    payToMint.wait();
-    expect(await memori.ownerOf(1)).to.equal(user.address);
 
     const transfer = await memori.connect(owner).transferFrom(owner.address, user.address, 0);
     transfer.wait();

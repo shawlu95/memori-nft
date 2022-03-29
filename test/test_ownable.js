@@ -4,7 +4,7 @@ const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
 const { parseEther } = require('ethers/lib/utils');
 
-describe.skip('Test Ownable', function () {
+describe('Test Ownable', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
 
   const price = parseEther('0.1');

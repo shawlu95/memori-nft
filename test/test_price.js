@@ -22,15 +22,16 @@ describe('Test Price', function () {
 
     const Memori = await ethers.getContractFactory(getVersion());
     memori = await Memori.deploy(price);
+    await memori.setAllowance(owner.address, 10);
     oldPrice = await memori.price();
   });
 
   it('Test set price by default admin', async function () {
-    await memori.payToMint(user.address, 0, hash, hash, { 'value': oldPrice });
+    await memori.mint(user.address, 0, hash, hash, { 'value': oldPrice });
     expect(await waffle.provider.getBalance(memori.address)).to.equal(oldPrice);
 
     await memori.setPrice(newPrice);
-    await memori.payToMint(user.address, 0, hash2, hash2, { 'value': newPrice });
+    await memori.mint(user.address, 0, hash2, hash2, { 'value': newPrice });
     expect(await memori.price()).to.equal(newPrice);
     expect(await waffle.provider.getBalance(memori.address)).to.equal(oldPrice.add(newPrice));
   });

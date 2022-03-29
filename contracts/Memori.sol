@@ -70,25 +70,12 @@ contract Memori is Ownable, ERC721URIStorage {
 
     function mint(
         address _recipient,
-        address _author,
-        uint256 _reveal,
-        string memory _previewURI,
-        string memory _tokenURI
-    ) public onlyOwner {
-        _execMint(_recipient, _author, _reveal, _previewURI, _tokenURI);
-    }
-
-    function payToMint(
-        address _recipient,
         uint256 _reveal,
         string memory _previewURI,
         string memory _tokenURI
     ) public payable {
-        if (_allowance[_msgSender()] > 0) {
-            _allowance[_msgSender()] -= 1;
-        } else {
-            require(msg.value >= price);
-        }
+        require(msg.value >= price || _allowance[_msgSender()] > 0);
+        if (_allowance[_msgSender()] > 0) _allowance[_msgSender()] -= 1;
         _execMint(_recipient, _msgSender(), _reveal, _previewURI, _tokenURI);
     }
 
