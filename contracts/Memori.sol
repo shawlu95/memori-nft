@@ -20,7 +20,7 @@ contract Memori is Ownable, ERC721URIStorage {
     event SetPrice(uint256 price);
     event WithdrawEther(uint256 amount);
 
-    constructor(uint256 _price) ERC721("Memo-ri", "MEMO") {
+    constructor(uint256 _price) ERC721("memo-ri", "MEMO") {
         price = _price;
     }
 
@@ -41,8 +41,8 @@ contract Memori is Ownable, ERC721URIStorage {
         return _revealAt[_tokenURI];
     }
 
-    function makeURI(string memory CID) internal pure returns (string memory) {
-        return string(abi.encodePacked("ipfs://", CID));
+    function makeURI(string memory cid) internal pure returns (string memory) {
+        return string(abi.encodePacked("ipfs://", cid));
     }
 
     function getByte32(string memory _tokenURI)
@@ -63,16 +63,7 @@ contract Memori is Ownable, ERC721URIStorage {
     ) public payable {
         require(msg.value >= price || _allowance[_msgSender()] > 0);
         if (_allowance[_msgSender()] > 0) _allowance[_msgSender()] -= 1;
-        _execMint(_recipient, _msgSender(), _reveal, _previewURI, _tokenURI);
-    }
 
-    function _execMint(
-        address _recipient,
-        address _author,
-        uint256 _reveal,
-        string memory _previewURI,
-        string memory _tokenURI
-    ) internal {
         bytes32 byteURI = getByte32(_tokenURI);
         require(_ipfsHash[byteURI] == false);
         uint256 id = _minted.current();
@@ -80,7 +71,7 @@ contract Memori is Ownable, ERC721URIStorage {
         _setTokenURI(id, makeURI(_tokenURI));
         _previewURIs[id] = makeURI(_previewURI);
         _revealAt[id] = _reveal;
-        _authors[id] = _author;
+        _authors[id] = _msgSender();
         _ipfsHash[byteURI] = true;
         _minted.increment();
     }
