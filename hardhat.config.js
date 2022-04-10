@@ -52,7 +52,7 @@ task("list", "List all nfts of a proxy address")
 module.exports = {
   defaultNetwork: "hardhat",
   solidity: {
-    version: "0.8.2",
+    version: "0.8.7",
     settings: {
       optimizer: {
         enabled: true,

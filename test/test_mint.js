@@ -4,6 +4,7 @@ const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
 const { keccak256 } = require('../scripts/util');
 const { parseEther } = require('ethers/lib/utils');
+const { Forwarder } = require('../scripts/config.json')['31337'];
 
 describe('Test Mint', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -19,7 +20,8 @@ describe('Test Mint', function () {
   beforeEach(async function () {
     [owner, minter, user] = await ethers.getSigners();
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await Memori.deploy(price);
+    memori = await Memori.deploy(Forwarder);
+    await memori.setPrice(price);
     await memori.setAllowance(owner.address, 10);
   });
 

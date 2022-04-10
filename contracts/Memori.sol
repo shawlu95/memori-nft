@@ -1,11 +1,12 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@opengsn/contracts/src/BaseRelayRecipient.sol";
 
-contract Memori is Ownable, ERC721URIStorage {
+contract Memori is Ownable, ERC721URIStorage, BaseRelayRecipient {
     using Counters for Counters.Counter;
     Counters.Counter private _minted;
     Counters.Counter private _burned;
@@ -20,8 +21,8 @@ contract Memori is Ownable, ERC721URIStorage {
     event SetPrice(uint256 price);
     event WithdrawEther(uint256 amount);
 
-    constructor(uint256 _price) ERC721("memo-ri", "MEMO") {
-        price = _price;
+    constructor(address _forwarder) ERC721("memo-ri", "MEMO") {
+        _setTrustedForwarder(_forwarder);
     }
 
     function supply() public view returns (uint256) {
@@ -117,5 +118,27 @@ contract Memori is Ownable, ERC721URIStorage {
         _burn(tokenId);
         delete _authors[tokenId];
         _burned.increment();
+    }
+
+    function versionRecipient() external pure override returns (string memory) {
+        return "2.2.5";
+    }
+
+    function _msgData()
+        internal
+        view
+        override(Context, BaseRelayRecipient)
+        returns (bytes calldata ret)
+    {
+        return BaseRelayRecipient._msgData();
+    }
+
+    function _msgSender()
+        internal
+        view
+        override(Context, BaseRelayRecipient)
+        returns (address ret)
+    {
+        return BaseRelayRecipient._msgSender();
     }
 }

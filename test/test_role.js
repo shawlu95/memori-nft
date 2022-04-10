@@ -4,6 +4,7 @@ const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
 const { keccak256 } = require('../scripts/util');
 const { parseEther } = require('ethers/lib/utils');
+const { Forwarder } = require('../scripts/config.json')['31337'];
 
 describe.skip('Test Role', function () {
   const price = parseEther('0.1');
@@ -17,7 +18,7 @@ describe.skip('Test Role', function () {
     [owner, admin, minter, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await Memori.deploy(price, reward, constants.ZERO_ADDRESS);
+    memori = await Memori.deploy(Forwarder);
 
     ADMIN_ROLE = keccak256('ADMIN_ROLE');
     MINTER_ROLE = keccak256('MINTER_ROLE');

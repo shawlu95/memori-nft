@@ -3,6 +3,7 @@ const { ethers, waffle, upgrades } = require('hardhat');
 const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
 const { parseEther } = require('ethers/lib/utils');
+const { Forwarder } = require('../scripts/config.json')['31337'];
 
 describe('Test Transaction', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -17,7 +18,7 @@ describe('Test Transaction', function () {
     [owner, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await Memori.deploy(price);
+    memori = await Memori.deploy(Forwarder);
     await memori.setAllowance(owner.address, 10);
   });
 

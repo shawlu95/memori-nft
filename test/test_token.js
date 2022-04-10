@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/address');
 const { parseEther } = require('ethers/lib/utils');
+const { Forwarder } = require('../scripts/config.json')['31337'];
 
 describe.skip('Memo', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -19,7 +20,7 @@ describe.skip('Memo', function () {
     token = await Memo.deploy(totalSupply);
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await Memori.deploy(price);
+    memori = await Memori.deploy(Forwarder);
   });
 
   it('Test name', async function () {
