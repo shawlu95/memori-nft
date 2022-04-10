@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { ethers, upgrades } = require('hardhat');
 const { constants } = require('@openzeppelin/test-helpers');
-const { getVersion } = require('../scripts/address');
+const { getVersion } = require('../scripts/util');
 const { parseEther } = require('ethers/lib/utils');
 const { Forwarder } = require('../scripts/config.json')['31337'];
 

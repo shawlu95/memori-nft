@@ -4,4 +4,8 @@ const keccak256 = (data) => {
   return '0x' + keccak('keccak256').update(data).digest('hex');
 };
 
-module.exports = { keccak256 };
+const getVersion = () => {
+  return 'Memori';
+};
+
+module.exports = { keccak256, getVersion };
