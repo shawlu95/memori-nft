@@ -12,7 +12,7 @@ async function main() {
 
   const price = parseEther('10');
   const Memori = await ethers.getContractFactory(getVersion());
-  const { Forwarder } = require('./config.json')[chainId];
+  const { Forwarder, RelayHub } = require('./config.json')[chainId];
   const memori = await Memori.deploy(Forwarder);
   await memori.setPrice(price);
   await memori.setAllowance(owner.address, 1000);
@@ -22,6 +22,8 @@ async function main() {
   const paymaster = await Paymaster.deploy();
   await paymaster.whitelistSender(owner.address);
   await paymaster.whitelistTarget(memori.address);
+  await paymaster.setRelayHub(RelayHub);
+  await paymaster.setTrustedForwarder(Forwarder);
   console.log("Paymaster deployed to:", paymaster.address);
 }
 
