@@ -30,7 +30,7 @@ task("balance", "Prints an account's balance")
     console.log(web3.utils.fromWei(balance, "ether"), "ETH");
   });
 
-// example: hh list --network rinkeby --address 0x84725B0E283E873105f93B0762257e44c0b16295
+// example: hh list --network polygon --address 0xfa68807f58bb32bae311da29733b61281d564ff5
 task("list", "List all nfts of a proxy address")
   .addParam("address", "Contract proxy address")
   .setAction(async (args, hre) => {
@@ -38,14 +38,17 @@ task("list", "List all nfts of a proxy address")
     console.log("Current account:", owner.address);
     console.log("NFT address:", args.address);
 
-    const Memento = await ethers.getContractFactory("Memento");
-    const memento = await Memento.attach(args.address);
-    const supply = await memento.supply();
+    const Memori = await ethers.getContractFactory("Memori");
+    const memori = await Memori.attach(args.address);
+    const supply = await memori.supply();
+    const now = parseInt(Date.now() / 1000);
     for (let i = 0; i < supply; i++) {
-      let owner = await memento.ownerOf(i);
-      let author = await memento.authorOf(i);
-      let uri = await memento.tokenURI(i);
-      console.log(`ID ${i}. Author ${author}. Owner ${owner}. URI ${uri}`);
+      let owner = await memori.ownerOf(i);
+      let author = await memori.authorOf(i);
+      let uri = await memori.tokenURI(i);
+      let revealAt = await memori.revealAt(i);
+      console.log(`ID ${i}. Author ${author}. Owner ${owner}. URI ${uri}, revealAt ${revealAt}. Revealed: ${revealAt
+        < now}`);
     }
   });
 
