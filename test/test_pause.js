@@ -43,7 +43,9 @@ describe.skip('Test Pause', function () {
     const pauserRole = await keccak256('PAUSER_ROLE');
 
     expect(await memori.hasRole(pauserRole, pauser.address)).to.equal(false);
-    const tx1 = await memori.connect(owner).grantRole(pauserRole, pauser.address);
+    const tx1 = await memori
+      .connect(owner)
+      .grantRole(pauserRole, pauser.address);
     tx1.wait();
     expect(await memori.hasRole(pauserRole, pauser.address)).to.equal(true);
 
@@ -64,8 +66,11 @@ describe.skip('Test Pause', function () {
     pause.wait();
     expect(await memori.paused()).to.equal(true);
 
-    await expect(memori.connect(owner).mint(owner.address, 0, hash, hash)).to.be.reverted;
-    await expect(memori.connect(user).transferFrom(user.address, owner.address, 0)).to.be.reverted;
+    await expect(memori.connect(owner).mint(owner.address, hash)).to.be
+      .reverted;
+    await expect(
+      memori.connect(user).transferFrom(user.address, owner.address, 0)
+    ).to.be.reverted;
     await expect(memori.burn(0)).to.be.reverted;
   });
 
@@ -80,11 +85,13 @@ describe.skip('Test Pause', function () {
     unpause.wait();
     expect(await memori.paused()).to.equal(false);
 
-    const mint = await memori.connect(owner).mint(owner.address, 0, hash, hash);
+    const mint = await memori.connect(owner).mint(owner.address, hash);
     mint.wait();
     expect(await memori.ownerOf(0)).to.equal(owner.address);
 
-    const transfer = await memori.connect(owner).transferFrom(owner.address, user.address, 0);
+    const transfer = await memori
+      .connect(owner)
+      .transferFrom(owner.address, user.address, 0);
     transfer.wait();
     expect(await memori.ownerOf(0)).to.equal(user.address);
     expect(await memori.balanceOf(user.address)).to.equal(2);

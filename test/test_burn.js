@@ -23,10 +23,10 @@ describe('Test Burn', function () {
     memori = await Memori.deploy(Forwarder);
     await memori.setAllowance(owner.address, 10);
 
-    const mint0 = await memori.mint(owner.address, 0, hash0, hash0);
+    const mint0 = await memori.mint(owner.address, hash0);
     mint0.wait();
 
-    const mint1 = await memori.mint(user.address, 0, hash1, hash1);
+    const mint1 = await memori.mint(user.address, hash1);
     mint1.wait();
 
     expect(await memori.supply()).to.equal(2);

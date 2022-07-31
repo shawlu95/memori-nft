@@ -26,7 +26,7 @@ describe.skip('Test proxy', function () {
   it('Test upgrade proxy', async function () {
     expect(await memori.supply()).to.equal(0);
 
-    await memori.mint(owner.address, owner.address, 0, hash, hash);
+    await memori.mint(owner.address, owner.address, hash);
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memori.authorOf(0)).to.equal(owner.address);

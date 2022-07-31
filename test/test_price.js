@@ -28,25 +28,33 @@ describe('Test Price', function () {
   });
 
   it('Test set price by default admin', async function () {
-    await memori.mint(user.address, 0, hash, hash, { 'value': oldPrice });
+    await memori.mint(user.address, hash, { value: oldPrice });
     expect(await waffle.provider.getBalance(memori.address)).to.equal(oldPrice);
 
     await memori.setPrice(newPrice);
-    await memori.mint(user.address, 0, hash2, hash2, { 'value': newPrice });
+    await memori.mint(user.address, hash2, { value: newPrice });
     expect(await memori.price()).to.equal(newPrice);
-    expect(await waffle.provider.getBalance(memori.address)).to.equal(oldPrice.add(newPrice));
+    expect(await waffle.provider.getBalance(memori.address)).to.equal(
+      oldPrice.add(newPrice)
+    );
   });
 
   it.skip('Test set price by finance role', async function () {
     const FINANCE_ROLE = await keccak256('FINANCE_ROLE');
     const ADMIN_ROLE = await keccak256('ADMIN_ROLE');
-    const setRoleAdmin = await memori.connect(owner).setRoleAdmin(FINANCE_ROLE, ADMIN_ROLE);
+    const setRoleAdmin = await memori
+      .connect(owner)
+      .setRoleAdmin(FINANCE_ROLE, ADMIN_ROLE);
     setRoleAdmin.wait();
 
-    const grantAdminRole = await memori.connect(owner).grantRole(ADMIN_ROLE, admin.address);
+    const grantAdminRole = await memori
+      .connect(owner)
+      .grantRole(ADMIN_ROLE, admin.address);
     grantAdminRole.wait();
 
-    const grantFinanceRole = await memori.connect(admin).grantRole(FINANCE_ROLE, finance.address);
+    const grantFinanceRole = await memori
+      .connect(admin)
+      .grantRole(FINANCE_ROLE, finance.address);
     grantFinanceRole.wait();
 
     await expect(memori.connect(admin).setPrice(newPrice)).to.be.reverted;
@@ -57,8 +65,7 @@ describe('Test Price', function () {
   });
 
   it('Test reject non-owner trying to set price', async function () {
-    await expect(memori.connect(user).setPrice(newPrice))
-      .to.be.reverted;
+    await expect(memori.connect(user).setPrice(newPrice)).to.be.reverted;
   });
 
   after(async function () {

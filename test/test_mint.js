@@ -27,13 +27,13 @@ describe('Test Mint', function () {
   it('Test mint by owner', async function () {
     expect(await memori.supply()).to.equal(0);
 
-    await memori.mint(owner.address, 0, hash, hash);
+    await memori.mint(owner.address, hash);
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memori.authorOf(0)).to.equal(owner.address);
     expect(await memori.ownerOf(0)).to.equal(owner.address);
 
-    await memori.mint(owner.address, 0, hash2, hash2);
+    await memori.mint(owner.address, hash2);
     expect(await memori.supply()).to.equal(2);
     expect(await memori.tokenURI(1)).to.equal(IPFS + hash2);
     expect(await memori.authorOf(1)).to.equal(owner.address);
@@ -43,25 +43,26 @@ describe('Test Mint', function () {
   it.skip('Test mint by minter', async function () {
     const minterRole = keccak256('MINTER_ROLE');
     expect(await memori.hasRole(minterRole, minter.address)).to.equal(false);
-    const grantRole = await memori.connect(owner).grantRole(minterRole, minter.address);
+    const grantRole = await memori
+      .connect(owner)
+      .grantRole(minterRole, minter.address);
     grantRole.wait();
     expect(await memori.hasRole(minterRole, minter.address)).to.equal(true);
 
-    await memori.connect(minter).mint(minter.address, 0, hash, hash);
+    await memori.connect(minter).mint(minter.address, hash);
     expect(await memori.supply()).to.equal(1);
     expect(await memori.ownerOf(0)).to.equal(minter.address);
   });
 
-  it('Test reject duplicate hash', async function () {
-    await memori.mint(owner.address, 0, hash, hash);
+  it.skip('Test reject duplicate hash', async function () {
+    await memori.mint(owner.address, hash);
 
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memori.authorOf(0)).to.equal(owner.address);
     expect(await memori.ownerOf(0)).to.equal(owner.address);
 
-    await expect(memori.mint(owner.address, 0, hash, hash))
-      .to.be.reverted;
+    await expect(memori.mint(owner.address, hash)).to.be.reverted;
     expect(await memori.supply()).to.equal(1);
   });
 
@@ -69,29 +70,29 @@ describe('Test Mint', function () {
     const price = await memori.price();
     expect(await waffle.provider.getBalance(memori.address)).to.equal(0);
 
-    await memori.mint(user.address, 0, hash, hash, { value: price });
+    await memori.mint(user.address, hash, { value: price });
     expect(await memori.supply()).to.equal(1);
     expect(await waffle.provider.getBalance(memori.address)).to.equal(price);
   });
 
   it('Test mint fail non-admin/minter', async function () {
     const [owner, user] = await ethers.getSigners();
-    await expect(memori.connect(user).mint(user.address, 0, hash, hash))
-      .to.be.reverted;
+    await expect(memori.connect(user).mint(user.address, hash)).to.be.reverted;
 
-    await memori.connect(owner).mint(owner.address, 0, hash, hash);
+    await memori.connect(owner).mint(owner.address, hash);
     expect(await memori.supply()).to.equal(1);
   });
 
   it('Test mint fail insufficient fund', async function () {
     const price = await memori.price();
-    await expect(memori.connect(user).mint(user.address, 0, hash, hash, { value: price.sub(1) }))
-      .to.be.reverted;
+    await expect(
+      memori.connect(user).mint(user.address, hash, { value: price.sub(1) })
+    ).to.be.reverted;
   });
 
   after(async function () {
     const balance = await waffle.provider.getBalance(memori.address);
     const tx = await memori.withdrawEther(balance);
     tx.wait();
-  })
+  });
 });

@@ -26,7 +26,7 @@ describe('Test Transaction', function () {
     const price = await memori.price();
     expect(await memori.provider.getBalance(memori.address)).to.equal(0);
 
-    await memori.connect(user).mint(user.address, 0, hash, hash, { value: price });
+    await memori.connect(user).mint(user.address, hash, { value: price });
     expect(await memori.supply()).to.equal(1);
     expect(await waffle.provider.getBalance(memori.address)).to.equal(price);
 

@@ -22,10 +22,10 @@ describe.skip('Test Set URI', function () {
     const Memori = await ethers.getContractFactory(getVersion());
     memori = await Memori.deploy(Forwarder);
 
-    const mint0 = await memori.mint(owner.address, owner.address, 0, hash0, hash0);
+    const mint0 = await memori.mint(owner.address, owner.address, hash0);
     mint0.wait();
 
-    const mint1 = await memori.mint(user.address, owner.address, 0, hash1, hash1);
+    const mint1 = await memori.mint(user.address, owner.address, hash1);
     mint1.wait();
 
     expect(await memori.supply()).to.equal(2);

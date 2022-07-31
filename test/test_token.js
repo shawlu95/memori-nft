@@ -42,7 +42,9 @@ describe.skip('Memo', function () {
     const tx = await token.connect(owner).send(memori.address, deposit, []);
     tx.wait();
 
-    expect(await token.balanceOf(owner.address)).to.equal(totalSupply - deposit);
+    expect(await token.balanceOf(owner.address)).to.equal(
+      totalSupply - deposit
+    );
     expect(await token.balanceOf(memori.address)).to.equal(deposit);
   });
 
@@ -55,10 +57,9 @@ describe.skip('Memo', function () {
 
     expect(await token.balanceOf(memori.address)).to.equal(deposit);
 
-    await memori.connect(user).payToMint(user.address, 0, hash, hash, { value: price });
+    await memori.connect(user).payToMint(user.address, hash, { value: price });
 
     expect(await token.balanceOf(memori.address)).to.equal(deposit - 10);
     expect(await token.balanceOf(user.address)).to.equal(10);
   });
-
 });

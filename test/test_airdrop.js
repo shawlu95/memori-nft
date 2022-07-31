@@ -27,7 +27,7 @@ describe('Test Airdrop', function () {
   it('Mint by owner, assign to another user', async function () {
     expect(await memori.supply()).to.equal(0);
 
-    await memori.mint(user1.address, 0, hash, hash);
+    await memori.mint(user1.address, hash);
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memori.authorOf(0)).to.equal(owner.address);
@@ -38,7 +38,7 @@ describe('Test Airdrop', function () {
     const price = await memori.price();
     expect(await memori.supply()).to.equal(0);
 
-    await memori.connect(user1).mint(user2.address, 0, hash, hash, { 'value': price });
+    await memori.connect(user1).mint(user2.address, hash, { value: price });
     expect(await memori.supply()).to.equal(1);
     expect(await memori.tokenURI(0)).to.equal(IPFS + hash);
     expect(await memori.authorOf(0)).to.equal(user1.address);
