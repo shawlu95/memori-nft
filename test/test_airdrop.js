@@ -1,9 +1,7 @@
 const { expect } = require('chai');
-const { ethers, upgrades } = require('hardhat');
-const { constants } = require('@openzeppelin/test-helpers');
+const { ethers } = require('hardhat');
 const { getVersion } = require('../scripts/util');
 const { parseEther } = require('ethers/lib/utils');
-const { Forwarder } = require('../scripts/config.json')['31337'];
 
 describe('Test Airdrop', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -20,7 +18,7 @@ describe('Test Airdrop', function () {
     [owner, user1, user2] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await Memori.deploy(Forwarder);
+    memori = await Memori.deploy();
     await memori.setAllowance(owner.address, 10);
   });
 

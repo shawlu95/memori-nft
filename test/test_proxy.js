@@ -1,9 +1,7 @@
 const { expect } = require('chai');
 const { ethers, waffle, upgrades } = require('hardhat');
-const { constants } = require('@openzeppelin/test-helpers');
 const { getVersion } = require('../scripts/util');
 const { parseEther } = require('ethers/lib/utils');
-const { Forwarder } = require('../scripts/config.json')['31337'];
 
 describe.skip('Test proxy', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
@@ -20,7 +18,7 @@ describe.skip('Test proxy', function () {
     [owner, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory('Memori');
-    memori = await Memori.deploy(Forwarder);
+    memori = await Memori.deploy();
   });
 
   it('Test upgrade proxy', async function () {

@@ -1,15 +1,9 @@
 const { expect } = require('chai');
-const { ethers, waffle, upgrades } = require('hardhat');
-const { constants } = require('@openzeppelin/test-helpers');
+const { ethers, waffle } = require('hardhat');
 const { keccak256, getVersion } = require('../scripts/util');
-const { parseEther } = require('ethers/lib/utils');
-const { Forwarder } = require('../scripts/config.json')['31337'];
 
 describe.skip('Test Pause', function () {
   const hash = 'QmSQ9zAgT4XpVRAvNdFAF5vEjVWdJa9jht8hL3LTpXouY7';
-  const hash2 = 'QmUyjqWUf6SzWBTZjCbZh1QbQBb7CyyKGAhxRfADCtVhDg';
-  const price = parseEther('0.1');
-  const reward = 0;
 
   let memori;
   let owner;
@@ -20,7 +14,7 @@ describe.skip('Test Pause', function () {
     [owner, pauser, user] = await ethers.getSigners();
 
     const Memori = await ethers.getContractFactory(getVersion());
-    memori = await Memori.deploy(Forwarder);
+    memori = await Memori.deploy();
     await memori.setAllowance(owner.address, 10);
   });
 
