@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.14;
 
 import '@openzeppelin/contracts/utils/Counters.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
@@ -17,7 +17,7 @@ contract Memori is Ownable, ERC721URIStorage {
   event SetPrice(uint256 price);
   event WithdrawEther(uint256 amount);
 
-  constructor() ERC721('memo-ri', 'MEMO') {}
+  constructor() ERC721('Memori', 'MEMO') {}
 
   function mint(address _recipient, string memory _tokenURI) public payable {
     require(msg.value >= price || _allowance[_msgSender()] > 0);
