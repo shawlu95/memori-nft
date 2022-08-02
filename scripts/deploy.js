@@ -13,8 +13,12 @@ async function main() {
   const price = parseEther('0.1');
   const Memori = await ethers.getContractFactory(getVersion());
   const memori = await Memori.deploy();
-  await memori.setPrice(price);
-  await memori.setAllowance(minter.address, 365);
+  const tx1 = await memori.setPrice(price);
+  await tx1.wait(1);
+
+  const tx2 = await memori.setAllowance(minter.address, 365);
+  await tx2.wait(1);
+
   console.log('Memori deployed to:', memori.address);
 }
 
