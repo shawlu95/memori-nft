@@ -16,8 +16,11 @@ async function main() {
   const tx1 = await memori.setPrice(price);
   await tx1.wait(1);
 
-  const tx2 = await memori.setAllowance(minter.address, 365);
+  const tx2 = await memori.setAllowance(owner.address, 365);
   await tx2.wait(1);
+
+  const tx3 = await memori.setAllowance(minter.address, 365);
+  await tx3.wait(1);
 
   console.log('Memori deployed to:', memori.address);
 }
