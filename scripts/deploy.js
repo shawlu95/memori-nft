@@ -1,44 +1,28 @@
-const { ethers, upgrades } = require('hardhat');
+const { ethers } = require('hardhat');
 const hre = require('hardhat');
+const { getVersion } = require('./util');
 const { parseEther } = require('ethers/lib/utils');
-const address = require('./address');
 
 async function main() {
   await hre.run('compile');
-  const chainId = hre.network.config.chainId;
 
-  const [owner] = await ethers.getSigners();
+  const [owner, minter] = await ethers.getSigners();
+  console.log('owner', owner.address);
+  console.log('minter', minter.address);
 
+  const price = parseEther('0.1');
+  const Memori = await ethers.getContractFactory(getVersion());
+  const memori = await Memori.deploy();
+  const tx1 = await memori.setPrice(price);
+  await tx1.wait(1);
 
-  const Memo = await ethers.getContractFactory('Memo');
-  let memo, memento;
-  let tokenAddress = address.getTokenAddress(chainId);
+  const tx2 = await memori.setAllowance(owner.address, 365);
+  await tx2.wait(1);
 
-  const tokenSupply = parseEther('1000000000');
-  if (!tokenAddress) {
-    memo = await Memo.deploy(tokenSupply, { gasLimit: 3000000 });
-    memo.deployed()
-    tokenAddress = memo.address;
-    console.log('Token deployed:', tokenAddress);
-  } else {
-    memo = await Memo.attach(tokenAddress);
-    console.log('tokenAddress:', tokenAddress);
-  }
+  const tx3 = await memori.setAllowance(minter.address, 365);
+  await tx3.wait(1);
 
-  const price = parseEther('10');
-  const reward = parseEther('10');
-  const Memori = await ethers.getContractFactory('Memori');
-  let memoriAddress = address.getNftAddress(chainId);
-  if (!memoriAddress) {
-    memento = await upgrades.deployProxy(Memori, [price, reward, memo.address], { gasLimit: 4000000 });
-    console.log('Memori deployed to:', memento.address);
-  } else {
-    memento = Memori.attach(memoriAddress);
-    console.log('memoriAddress:', memoriAddress);
-  }
-
-  // transfer balance to the NFT proxy contract
-  await memo.connect(owner).send(memento.address, tokenSupply, [], { gasLimit: 210000 });
+  console.log('Memori deployed to:', memori.address);
 }
 
 main().catch((error) => {
