@@ -4,6 +4,8 @@ Celebrate your life with Memori NFT. Write a letter to your future self and love
 
 ## Getting Started
 
+Use 'hh' as short hand for 'npx hardhat' (see [details](https://hardhat.org/hardhat-runner/docs/guides/command-line-completion)).
+
 ```
 npm install
 
@@ -15,7 +17,7 @@ hh coverage
 ## Deploy
 
 ```shell
-hardhat run --network goerli scripts/deploy.js
+hh run --network goerli scripts/deploy.js
 ```
 
 ## Verify Contract
@@ -23,12 +25,13 @@ hardhat run --network goerli scripts/deploy.js
 Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
 
 ```shell
-npx hardhat verify \
+hh verify \
   --contract contracts/Memori.sol:Memori \
-  --network mainnet 0x8d6001ef522517fcd71ee746d649e4553b281cec
+  --network goerli 0x6078DE5E15019a77d16AAcc7df55e64Cdbf985Ae
 ```
 
 ### Links
 
 - ETH Mainnet [Memori.sol](https://etherscan.io/address/0x8d6001ef522517fcd71ee746d649e4553b281cec)
+- Goerli Mainnet [Memori.sol](hhttps://goerli.etherscan.io/address/0x6078DE5E15019a77d16AAcc7df55e64Cdbf985Ae)
 - [OpenSea](https://opensea.io/collection/memori-nft)
